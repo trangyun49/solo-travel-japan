@@ -103,16 +103,17 @@ function trainLinks(a, b, date) {
 
 function hotelLinks(b, date) {
   const out = addDays(date, 1);
+  const agodaSlug = b.agoda || b.key;
   return [
     {
       provider: 'Agoda',
-      label: `${b.name}のホテル（1名・1泊）`,
-      url: `https://www.agoda.com/ja-jp/search?textToSearch=${enc(b.name.replace(/（.*）/, ''))}&checkIn=${date}&checkOut=${out}&rooms=1&adults=1&children=0`,
+      label: `${b.name}のホテル（${date}から1泊・大人1名）`,
+      url: `https://www.agoda.com/ja-jp/city/${agodaSlug}-jp.html?checkIn=${date}&los=1&rooms=1&adults=1&children=0`,
     },
     {
       provider: 'Trip.com',
-      label: `${b.name}のホテル（1名・1泊）`,
-      url: `https://jp.trip.com/hotels/list?keyword=${enc(b.name.replace(/（.*）/, ''))}&checkin=${date.replace(/-/g, '/')}&checkout=${out.replace(/-/g, '/')}&adult=1&crn=1&locale=ja-JP&curr=JPY`,
+      label: 'Trip.comでホテルを探す（目的地・日付は予約サイトで入力）',
+      url: 'https://jp.trip.com/hotels/?locale=ja-JP&curr=JPY',
     },
   ];
 }

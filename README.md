@@ -11,7 +11,7 @@ Website du lịch dành cho người đi du lịch một mình tại Nhật Bả
 | Database | PostgreSQL (production – Neon/Vercel Postgres/Render…) · SQLite tích hợp sẵn của Node (`node:sqlite`) khi chạy local |
 | Bảo mật | bcrypt (băm mật khẩu), JWT trong cookie `httpOnly` + `SameSite=Lax` (+ `Secure` khi production), Helmet (CSP, các header bảo mật), giới hạn số lần đăng nhập (rate limit), kiểm tra Origin + chỉ nhận JSON cho các request thay đổi dữ liệu, kiểm tra dữ liệu đầu vào phía server |
 | Giá vé máy bay thời gian thực (tuỳ chọn) | Google Flights qua **SerpApi** (`SERPAPI_KEY`) |
-| Liên kết tìm vé | Trip.com, Google Flights, Skyscanner, Traveloka (máy bay) · バス比較なび, WILLER EXPRESS, 高速バスネット (xe bus) · Google Maps, NAVITIME, えきねっと, スマートEX (tàu) · Agoda, Trip.com (khách sạn) |
+| Liên kết tìm vé | Trip.com, Google Flights, Skyscanner, Traveloka (máy bay) · バス比較なび, WILLER EXPRESS, 高速バスネット (xe bus) · Google Maps, NAVITIME, えきねっと, スマートEX (tàu) · Agoda (khách sạn, theo thành phố + ngày + 1 người), Trip.com (trang khách sạn) |
 
 ## Chạy local
 

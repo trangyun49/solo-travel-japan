@@ -20,7 +20,7 @@ const CITIES = [
   { key: 'kanazawa',  name: '金沢',   en: 'Kanazawa',  region: 'chubu',    lat: 36.578, lng: 136.648, airports: ['KMQ'], tripCode: 'kmq', bus: 'ishikawa', station: '金沢駅' },
   { key: 'matsumoto', name: '松本',   en: 'Matsumoto', region: 'chubu',    lat: 36.231, lng: 137.964, airports: ['MMJ'], tripCode: 'mmj', bus: 'nagano', station: '松本駅' },
   { key: 'takayama',  name: '高山',   en: 'Takayama',  region: 'chubu',    lat: 36.141, lng: 137.252, airports: [], tripCode: '', bus: 'gifu', station: '高山駅' },
-  { key: 'kawaguchiko', name: '河口湖', en: 'Kawaguchiko', region: 'chubu', lat: 35.498, lng: 138.769, airports: [], tripCode: '', bus: 'yamanashi', station: '河口湖駅' },
+  { key: 'kawaguchiko', name: '河口湖', en: 'Kawaguchiko', region: 'chubu', lat: 35.498, lng: 138.769, airports: [], tripCode: '', bus: 'yamanashi', station: '河口湖駅', agoda: 'fujikawaguchiko' },
   { key: 'nagoya',    name: '名古屋', en: 'Nagoya',    region: 'chubu',    lat: 35.170, lng: 136.881, airports: ['NGO'], tripCode: 'ngo', bus: 'aichi', station: '名古屋駅' },
   { key: 'kyoto',     name: '京都',   en: 'Kyoto',     region: 'kansai',   lat: 34.985, lng: 135.758, airports: ['ITM', 'KIX'], tripCode: 'osa', bus: 'kyoto', station: '京都駅', airportNote: '京都に空港はないため、大阪（伊丹・関西）の空港で検索します。' },
   { key: 'osaka',     name: '大阪',   en: 'Osaka',     region: 'kansai',   lat: 34.702, lng: 135.495, airports: ['ITM', 'KIX'], tripCode: 'osa', bus: 'osaka', station: '大阪駅' },
