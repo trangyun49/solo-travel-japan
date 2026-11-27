@@ -26,7 +26,7 @@ npm start                 # http://localhost:3000
 npm test                  # chạy smoke test toàn bộ API (DB tạm trong bộ nhớ)
 ```
 
-Không cần cài database khi chạy local: dữ liệu được lưu vào `data/app.db` (SQLite) và tự tạo bảng + dữ liệu mẫu (51 địa điểm, 8 bài blog) ở lần chạy đầu.
+Không cần cài database khi chạy local: dữ liệu được lưu vào `data/app.db` (SQLite) và tự tạo bảng + dữ liệu mẫu (140 địa điểm ở 30 thành phố, 8 bài blog) ở lần chạy đầu.
 Muốn dùng PostgreSQL local: đặt `DATABASE_URL=postgres://user:pass@localhost:5432/dbname` trong `.env`.
 
 ## Biến môi trường
@@ -62,7 +62,7 @@ src/
   auth.js            # phiên đăng nhập (JWT cookie)
   validate.js
   routes/            # auth, account, places, posts, trips
-  data/              # cities, places, posts, photos (Wikimedia), *-i18n (bản dịch VI/EN), meta
+  data/              # cities, places, more/ (địa điểm bổ sung JA/EN/VI), posts, photos (Wikimedia), *-i18n, meta
   i18n.js            # dịch thông báo lỗi API theo ngôn ngữ (header X-Lang / cookie stj_lang)
 public/              # trang HTML, css/app.css, js/i18n.js (từ điển giao diện), js/*.js, img/
 scripts/smoke-test.js

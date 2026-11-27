@@ -1,7 +1,8 @@
 'use strict';
 const crypto = require('crypto');
 const db = require('./db');
-const places = require('./data/places');
+const basePlaces = require('./data/places');
+const morePlaces = require('./data/more');
 const posts = require('./data/posts');
 const photos = require('./data/photos');
 const placesI18n = require('./data/places-i18n');
@@ -9,8 +10,13 @@ const postsI18n = require('./data/posts-i18n');
 const placesDetail = require('./data/places-detail-i18n');
 const postsBody = require('./data/posts-body-i18n');
 
+// Merge the extra places (stored as ja/en/vi tuples) into the same shape as the base list.
+const places = basePlaces.concat(morePlaces.places);
+Object.assign(placesI18n, morePlaces.i18n);
+Object.assign(placesDetail, morePlaces.detail);
+
 // Bump when seed content in src/data changes so deployed DBs get refreshed.
-const SEED_VERSION = '2026-11-28.4';
+const SEED_VERSION = '2026-11-28.5';
 
 const PK = db.isPg ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
 

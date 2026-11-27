@@ -63,7 +63,7 @@ router.get('/', async (req, res) => {
   }
 
   const order = q.sort === 'solo' ? 'solo_score DESC, featured DESC, id ASC' : 'featured DESC, solo_score DESC, id ASC';
-  const limit = Math.min(Math.max(parseInt(q.limit, 10) || 60, 1), 100);
+  const limit = Math.min(Math.max(parseInt(q.limit, 10) || 60, 1), 200);
   const sql = `SELECT ${LIST_COLS} FROM places ${where.length ? 'WHERE ' + where.join(' AND ') : ''} ORDER BY ${order} LIMIT ${limit}`;
   const rows = await db.query(sql, params);
   res.json({ places: rows.map(shape), total: rows.length });

@@ -52,7 +52,7 @@
     const my = ++seq;
     list.innerHTML = `<div class="spinner" role="status" aria-label="${t('loading')}"></div>`;
     try {
-      const { places } = await api('/places?' + q);
+      const { places } = await api('/places?' + q + (q.toString() ? '&' : '') + 'limit=200');
       if (my !== seq) return;
       count.textContent = t('count_places', { n: places.length });
       list.innerHTML = places.length

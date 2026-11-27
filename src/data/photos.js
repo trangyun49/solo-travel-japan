@@ -57,10 +57,13 @@ const P = {
 };
 
 const photos = {};
-for (const [slug, [path, licence, author]] of Object.entries(P)) {
+Object.assign(P, require('./more/photos'));
+for (const [slug, [path, licence, author, original]] of Object.entries(P)) {
   const file = path.split('/').pop();
   photos[slug] = {
-    image: `https://upload.wikimedia.org/wikipedia/commons/thumb/${path}/960px-${file}`,
+    image: original
+      ? `https://upload.wikimedia.org/wikipedia/commons/${path}`
+      : `https://upload.wikimedia.org/wikipedia/commons/thumb/${path}/960px-${file}`,
     credit: `${author} / ${licence} / Wikimedia Commons`,
     creditUrl: `https://commons.wikimedia.org/wiki/File:${file}`,
   };
