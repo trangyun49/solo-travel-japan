@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+<script src="/js/common.js" defer></script>
+<title>スポットを探す｜ひとり旅ジャパン</title>
+<meta name="description" content="季節・月・エリア・カテゴリから、ひとり旅におすすめの観光スポット、グルメ、カフェ、温泉を探せます。">
+<script src="/js/places.js" defer></script>
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head">
+    <div class="wrap">
+      <h1 id="page-title">スポットを探す</h1>
+      <p>季節やエリアで絞り込んで、ひとり旅で行きたい場所を見つけましょう。●の数はひとり旅のしやすさ（5段階）です。</p>
+    </div>
+  </div>
+  <div class="wrap section">
+    <div class="layout-side">
+      <form class="filters collapsed" id="filters" role="search" aria-label="スポットの絞り込み">
+        <div class="field">
+          <label for="q">キーワード</label>
+          <input class="input" type="search" id="q" name="q" placeholder="例：京都、ラーメン、夜景" maxlength="50">
+        </div>
+        <div>
+          <h2 class="mb">カテゴリ</h2>
+          <div class="chips" data-group="category">
+            <button type="button" class="chip" data-value="">すべて</button>
+            <button type="button" class="chip" data-value="sightseeing">観光スポット</button>
+            <button type="button" class="chip" data-value="gourmet">グルメ</button>
+            <button type="button" class="chip" data-value="cafe">カフェ</button>
+            <button type="button" class="chip" data-value="onsen">温泉</button>
+          </div>
+        </div>
+        <div>
+          <h2 class="mb">エリア</h2>
+          <div class="chips" data-group="region">
+            <button type="button" class="chip" data-value="">全国</button>
+            <button type="button" class="chip" data-value="hokkaido">北海道</button>
+            <button type="button" class="chip" data-value="tohoku">東北</button>
+            <button type="button" class="chip" data-value="kanto">関東</button>
+            <button type="button" class="chip" data-value="chubu">中部</button>
+            <button type="button" class="chip" data-value="kansai">関西</button>
+            <button type="button" class="chip" data-value="chugoku">中国</button>
+            <button type="button" class="chip" data-value="shikoku">四国</button>
+            <button type="button" class="chip" data-value="kyushu">九州</button>
+            <button type="button" class="chip" data-value="okinawa">沖縄</button>
+          </div>
+        </div>
+        <div>
+          <h2 class="mb">季節</h2>
+          <div class="chips" data-group="season">
+            <button type="button" class="chip" data-value="">通年</button>
+            <button type="button" class="chip" data-value="spring">春</button>
+            <button type="button" class="chip" data-value="summer">夏</button>
+            <button type="button" class="chip" data-value="autumn">秋</button>
+            <button type="button" class="chip" data-value="winter">冬</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="month">月で選ぶ</label>
+          <select class="select" id="month" name="month">
+            <option value="">指定しない</option>
+          </select>
+        </div>
+        <label class="toggle"><input type="checkbox" id="solo"> ひとり旅に特におすすめ（●5）のみ</label>
+        <label class="toggle"><input type="checkbox" id="featured"> 編集部のおすすめのみ</label>
+        <button type="button" class="btn btn-outline" id="reset">条件をリセット</button>
+      </form>
+
+      <div>
+        <div class="result-bar">
+          <p id="count" aria-live="polite"></p>
+          <button type="button" class="btn btn-outline btn-sm filter-toggle" id="filter-toggle" aria-controls="filters" aria-expanded="false" data-icon="filter">絞り込み</button>
+        </div>
+        <div class="grid" id="list"><div class="spinner" role="status" aria-label="読み込み中"></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+</body>
+</html>

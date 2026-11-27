@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+<script src="/js/common.js" defer></script>
+<title>ブログ・旅のヒント｜ひとり旅ジャパン</title>
+<meta name="description" content="日本のひとり旅に役立つコツ、グルメ、季節の観光情報、旅人の体験記。">
+<script src="/js/blog.js" defer></script>
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h1>ブログ・旅のヒント</h1>
+          <p>編集部の旅ガイドと、旅人が投稿した体験記。あなたのひとり旅の話も投稿できます。</p>
+        </div>
+        <a class="btn btn-primary" href="/write" data-icon="pen">体験記を書く</a>
+      </div>
+    </div>
+  </div>
+  <div class="wrap section">
+    <form class="filters filters-inline" id="post-filters" role="search" aria-label="記事の絞り込み">
+      <div class="chips" data-group="category">
+        <button type="button" class="chip" data-value="">すべて</button>
+        <button type="button" class="chip" data-value="solo">ひとり旅</button>
+        <button type="button" class="chip" data-value="tips">旅のコツ</button>
+        <button type="button" class="chip" data-value="gourmet">グルメ</button>
+        <button type="button" class="chip" data-value="sightseeing">観光</button>
+        <button type="button" class="chip" data-value="experience">体験記</button>
+      </div>
+      <div class="filter-selects">
+        <label class="sr-only" for="season">季節</label>
+        <select class="select" id="season">
+          <option value="">季節：すべて</option>
+          <option value="spring">春</option><option value="summer">夏</option><option value="autumn">秋</option><option value="winter">冬</option>
+        </select>
+        <label class="sr-only" for="region">エリア</label>
+        <select class="select" id="region"><option value="">エリア：すべて</option></select>
+        <label class="sr-only" for="source">投稿者</label>
+        <select class="select" id="source">
+          <option value="">投稿者：すべて</option><option value="editorial">編集部</option><option value="community">旅人の投稿</option>
+        </select>
+        <label class="sr-only" for="q">キーワード</label>
+        <input class="input" type="search" id="q" placeholder="キーワード" maxlength="50">
+      </div>
+    </form>
+    <div id="posts" aria-live="polite"><div class="spinner" role="status" aria-label="読み込み中"></div></div>
+  </div>
+</main>
+<div id="site-footer"></div>
+</body>
+</html>
