@@ -1,63 +1,71 @@
 (function () {
   'use strict';
-  const { qs, api, params, esc, icon, thumb, soloMeter, placeCard, REGION, CATEGORY, getMe } = window.STJ;
+  const { qs, api, params, esc, icon, thumb, soloMeter, placeCard, REGION, CATEGORY, getMe, t, lang, placeName, placeSummary } = window.STJ;
+  const { monthShort, pick } = window.I18N;
   const root = qs('#place');
   const slug = params().get('slug');
 
   async function load() {
     if (!slug) {
-      root.innerHTML = '<div class="empty"><b>スポットが指定されていません</b><a href="/places">スポット一覧へ</a></div>';
+      root.innerHTML = `<div class="empty"><b>${t('no_slug')}</b><a href="/places">${t('back_places')}</a></div>`;
       return;
     }
     let d;
     try {
       d = await api('/places/' + encodeURIComponent(slug));
     } catch (err) {
-      root.innerHTML = `<div class="empty"><b>${esc(err.message)}</b><a href="/places">スポット一覧へ戻る</a></div>`;
+      root.innerHTML = `<div class="empty"><b>${esc(err.message)}</b><a href="/places">${t('back_places')}</a></div>`;
       return;
     }
     const p = d.place;
-    document.title = `${p.name}｜ひとり旅ジャパン`;
+    const name = placeName(p);
+    document.title = `${name}${t('suffix')}`;
     const me = await getMe();
-    const months = Array.from({ length: 12 }, (_, i) => `<span class="${p.months.includes(i + 1) ? 'on' : ''}">${i + 1}</span>`).join('');
-    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name.replace(/（.*?）|「.*?」/g, '') + ' ' + p.prefecture)}`;
+    const months = Array.from({ length: 12 }, (_, i) => `<span class="${p.months.includes(i + 1) ? 'on' : ''}">${lang === 'ja' ? i + 1 : monthShort(i + 1).replace(/^T/, '')}</span>`).join('');
+    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((p.name_en || p.name).replace(/\(.*?\)/g, '') + ' ' + p.prefecture)}`;
     const { cities } = await api('/trips/cities');
     const dest = cities.find((c) => c.key === p.city) || cities.find((c) => c.key === 'tokyo');
+    const destName = lang === 'ja' ? dest.name : dest.en;
     const home = me && me.homeCity && me.homeCity !== dest.key ? me.homeCity : dest.key === 'tokyo' ? 'osaka' : 'tokyo';
+    const tips = pick(p, 'solo_tips', 'tips_en', 'tips_vi');
+    const credit = p.credit
+      ? `<figcaption class="photo-credit">${t('photo')}: <a href="${esc(p.credit_url)}" target="_blank" rel="noopener noreferrer">${esc(p.credit)}</a></figcaption>`
+      : '';
 
     root.innerHTML = `
-      <nav class="crumbs" aria-label="パンくず"><a href="/">ホーム</a> ／ <a href="/places">スポット</a> ／ <a href="/places?region=${p.region}">${esc(REGION[p.region])}</a> ／ ${esc(p.name)}</nav>
+      <nav class="crumbs" aria-label="breadcrumb"><a href="/">${t('home')}</a> ／ <a href="/places">${t('nav_places')}</a> ／ <a href="/places?region=${p.region}">${esc(REGION[p.region])}</a> ／ ${esc(name)}</nav>
       <div class="section-head">
         <div>
-          <h1 class="page-title-lg">${esc(p.name)}</h1>
-          <p>${esc(p.name_en)}・${esc(p.prefecture)} ${esc(p.area)}・${esc(CATEGORY[p.category])}</p>
+          <h1 class="page-title-lg">${esc(name)}</h1>
+          <p>${lang === 'ja' ? esc(p.name_en) : esc(p.name)} · ${esc(REGION[p.region])}${lang === 'ja' ? ' ' + esc(p.prefecture) + ' ' + esc(p.area) : ''} · ${esc(CATEGORY[p.category])}</p>
         </div>
-        <button class="btn btn-outline" type="button" data-fav="${esc(p.slug)}" aria-pressed="${d.isFavorite}">${icon(d.isFavorite ? 'heartFill' : 'heart')} ${d.isFavorite ? 'お気に入り済み' : 'お気に入りに追加'}</button>
+        <button class="btn btn-outline" type="button" data-fav="${esc(p.slug)}" aria-pressed="${d.isFavorite}">${icon(d.isFavorite ? 'heartFill' : 'heart')} ${d.isFavorite ? t('fav_added') : t('fav_add')}</button>
       </div>
-      <div class="detail-hero">${thumb(p.image, p.category, p.name_en, p.name)}</div>
+      <figure class="detail-figure"><div class="detail-hero">${thumb(p.image, p.category, p.name_en, name)}</div>${credit}</figure>
       <div class="detail-grid">
         <article class="prose">
-          <p class="lead"><strong>${esc(p.summary)}</strong></p>
-          <p>${esc(p.description)}</p>
-          ${p.solo_tips ? `<div class="tip-box"><h2>${icon('solo')} ひとり旅のポイント</h2><p>${esc(p.solo_tips)}</p></div>` : ''}
-          <div class="tags mt">${p.tags.map((t) => `<a class="tag" href="/places?q=${encodeURIComponent(t)}">#${esc(t)}</a>`).join('')}</div>
+          <p class="lead"><strong>${esc(placeSummary(p))}</strong></p>
+          ${tips ? `<div class="tip-box"><h2>${icon('solo')} ${t('solo_points')}</h2><p>${esc(tips)}</p></div>` : ''}
+          ${lang !== 'ja' ? `<p class="note mt">${t('ja_only')}</p>` : ''}
+          <p class="${lang !== 'ja' ? 'ja-text' : ''}">${esc(p.description)}</p>
+          ${lang === 'ja' ? `<div class="tags mt">${p.tags.map((x) => `<a class="tag" href="/places?q=${encodeURIComponent(x)}">#${esc(x)}</a>`).join('')}</div>` : ''}
         </article>
         <aside class="info-card">
           <dl>
-            <div><dt>ひとり旅おすすめ度</dt><dd>${soloMeter(p.solo_score)} ${p.solo_score}/5</dd></div>
-            <div><dt>ベストシーズン</dt><dd><div class="month-dots" aria-label="おすすめの月">${months}</div></dd></div>
-            ${p.access ? `<div><dt>アクセス</dt><dd>${esc(p.access)}</dd></div>` : ''}
-            ${p.budget ? `<div><dt>予算の目安</dt><dd>${esc(p.budget)}</dd></div>` : ''}
+            <div><dt>${t('solo_score', { n: p.solo_score }).replace(/ ?\d\/5$/, '')}</dt><dd>${soloMeter(p.solo_score)} ${p.solo_score}/5</dd></div>
+            <div><dt>${t('best_season')}</dt><dd><div class="month-dots">${months}</div></dd></div>
+            ${p.access ? `<div><dt>${t('access')}</dt><dd lang="ja">${esc(p.access)}</dd></div>` : ''}
+            ${p.budget ? `<div><dt>${t('budget')}</dt><dd lang="ja">${esc(p.budget)}</dd></div>` : ''}
           </dl>
-          <a class="btn btn-outline" href="${mapUrl}" target="_blank" rel="noopener noreferrer">${icon('map')} Googleマップで見る</a>
-          <a class="btn btn-primary" href="/search?from=${home}&to=${dest.key}">${icon('search')} ${esc(dest.name)}への行き方を検索</a>
-          <p class="note">最寄りの拠点都市：${esc(dest.name)}</p>
-          <p class="note">営業時間・料金は変更されることがあります。お出かけ前に公式情報をご確認ください。</p>
+          <a class="btn btn-outline" href="${mapUrl}" target="_blank" rel="noopener noreferrer">${icon('map')} ${t('map_btn')}</a>
+          <a class="btn btn-primary" href="/search?from=${home}&to=${dest.key}">${icon('search')} ${t('route_btn', { c: esc(destName) })}</a>
+          <p class="note">${t('nearest_city', { c: esc(destName) })}</p>
+          <p class="note">${t('info_note')}</p>
         </aside>
       </div>
       ${
         d.related.length
-          ? `<section class="section"><div class="section-head"><h2>${esc(REGION[p.region])}のほかのスポット</h2></div><div class="grid">${d.related.map((x) => placeCard(x)).join('')}</div></section>`
+          ? `<section class="section"><div class="section-head"><h2>${t('other_spots', { r: esc(REGION[p.region]) })}</h2></div><div class="grid">${d.related.map((x) => placeCard(x)).join('')}</div></section>`
           : ''
       }`;
   }

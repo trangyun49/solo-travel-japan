@@ -1,26 +1,33 @@
 /* Solo Travel Japan — design tokens */
 :root {
-  --ink: #172033;
-  --ink-2: #3a4558;
-  --muted: #5b6577;
-  --line: #e3e8ef;
-  --bg: #f5f7fa;
+  /* Kawaii Journey palette: warm white, pink, green, coral */
+  --ink: #4a332d;
+  --ink-2: #5a433d;
+  --muted: #8a766f;
+  --line: #f4e3da;
+  --bg: #fffdf9;
   --surface: #ffffff;
-  --blue: #1f4fd1;
-  --blue-dark: #173da6;
-  --blue-soft: #e8efff;
-  --torii: #e0452b;
-  --torii-soft: #fdece8;
-  --spring: #f2a7b8;
-  --summer: #3fae8c;
-  --autumn: #e08a2b;
-  --winter: #6b8fd6;
-  --ok: #1d8a5a;
-  --radius-lg: 18px;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 6px 24px rgba(23, 32, 51, 0.08);
-  --font: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', Meiryo, sans-serif;
+  --blue: #ff6b8b;          /* primary (pink) */
+  --blue-dark: #e8507a;
+  --blue-soft: #ffe8ee;
+  --torii: #4fb466;         /* accent (green) */
+  --torii-soft: #e3f6e6;
+  --coral: #ff6f61;
+  --rose: #b76e79;
+  --card-purple: #e8e3ff;
+  --card-pink: #ffdce5;
+  --card-green: #d8f3dc;
+  --footer: #ffeedb;
+  --spring: #ffb3c6;
+  --summer: #6bcb77;
+  --autumn: #ff9f5a;
+  --winter: #8fb4ff;
+  --ok: #2f8a45;
+  --radius-lg: 28px;
+  --radius: 20px;
+  --radius-sm: 14px;
+  --shadow: 0 10px 30px rgba(255, 107, 139, 0.14);
+  --font: 'Nunito', 'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', Meiryo, sans-serif;
   --max: 1180px;
 }
 
@@ -387,4 +394,121 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .brand-mark { width: 30px; height: 30px; }
   .header-actions { gap: 4px; }
   .header-actions .btn-sm { padding: 6px 8px; font-size: 12.5px; }
+}
+
+
+/* ================= Kawaii theme overrides ================= */
+body { font-weight: 500; }
+h1, h2, h3, h4, .brand, .btn, .card-title { font-weight: 800; }
+.site-header { border-bottom: 2px dashed var(--card-pink); }
+.brand-mark { background: linear-gradient(135deg, var(--blue), var(--coral)); }
+.brand span { color: var(--ink); }
+.brand small { color: var(--rose); }
+.nav a[aria-current='page'] { color: var(--blue-dark); background: var(--blue-soft); }
+.btn { border-radius: 999px; }
+.btn-primary { background: linear-gradient(90deg, var(--coral), var(--blue)); box-shadow: 0 6px 16px rgba(255, 107, 139, 0.28); }
+.btn-primary:hover { background: linear-gradient(90deg, #f05a4d, var(--blue-dark)); }
+.btn-outline { border-color: var(--card-pink); background: #fff; }
+.btn-outline:hover { border-color: var(--blue); color: var(--blue-dark); }
+.btn-danger { color: #d9415a; border-color: #f7c3cc; }
+.btn-danger:hover { background: #ffecef; }
+.input, .select, .textarea { border-color: #f1d9d2; border-radius: var(--radius-sm); background: #fffaf8; }
+.input:focus, .select:focus, .textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+.alert-error { background: #ffe8ec; color: #b3263e; }
+.alert-ok { background: var(--torii-soft); color: var(--ok); }
+.alert-info { background: #fff3e6; color: #8a4b12; }
+:focus-visible { outline-color: var(--blue); }
+
+.hero::after { background: linear-gradient(180deg, rgba(74, 51, 45, 0.05) 0%, rgba(74, 51, 45, 0.55) 100%); }
+.search-card { border: 3px dashed var(--card-pink); }
+.search-tabs span { background: var(--card-pink); color: var(--blue-dark); }
+.search-tabs span:nth-child(2) { background: var(--card-green); color: #2f7a3d; }
+.search-tabs span:nth-child(3) { background: var(--card-purple); color: #5b4bb7; }
+.search-tabs span:nth-child(4) { background: #ffeedb; color: #a5591e; }
+.pax { background: var(--card-green); color: #2f7a3d; }
+.swap-btn { border-radius: 999px; }
+
+.season-band { background: #fff; border-bottom: 2px dashed var(--card-pink); }
+.month { background: #fff6f1; border-radius: 14px; }
+.month:hover { background: var(--blue-soft); }
+.month[aria-pressed='true'] { background: var(--blue); color: #fff; }
+.month.is-now::after { background: var(--torii); }
+
+.card { border-color: var(--line); border-radius: var(--radius); }
+.card:hover { box-shadow: var(--shadow); }
+.card:hover .card-title { color: var(--blue-dark); }
+.card-sub { font-size: 12.5px; color: var(--muted); margin-top: -4px; }
+.badge { border-radius: 999px; }
+.badge-solo { background: var(--torii); }
+.solo-meter i.on { background: var(--blue); }
+.fav-btn[aria-pressed='true'] { color: var(--blue); }
+.cat-sightseeing { background: #a99bf0; }
+.cat-gourmet { background: #ff8fa6; }
+.cat-cafe { background: #c99a78; }
+.cat-onsen { background: #6bcb77; }
+.glyph-torii { background: linear-gradient(135deg, var(--coral), var(--blue)); }
+.glyph-ink { background: var(--torii); }
+.cat-link { border-radius: var(--radius); }
+.cat-link:hover { border-color: var(--blue); }
+.cat-row .cat-link:nth-child(1) { background: #fff6f8; }
+.cat-row .cat-link:nth-child(2) { background: #fff4f6; }
+.cat-row .cat-link:nth-child(3) { background: #f6f4ff; }
+.cat-row .cat-link:nth-child(4) { background: #f2fbf3; }
+
+.chip { border-color: var(--line); border-radius: 999px; }
+.chip:hover { border-color: var(--blue); }
+.chip[aria-pressed='true'] { background: var(--blue); border-color: var(--blue); color: #fff; }
+.toggle input { accent-color: var(--blue); }
+.filters, .panel, .route-summary, .info-card, .account-panel, .account-nav, .auth-wrap, .post-feature { border-color: var(--line); }
+.page-head { background: linear-gradient(180deg, #fff 0%, #fff6f1 100%); border-bottom: 2px dashed var(--card-pink); }
+.prose h2 { border-left-color: var(--blue); }
+.prose strong { background: linear-gradient(transparent 62%, var(--card-pink) 62%); }
+.tip-box { background: var(--card-green); }
+.tip-box h2 { color: #2f7a3d; border-left: 0; padding-left: 0; }
+.month-dots span.on { background: var(--torii); }
+.mode-icon { background: var(--torii); }
+.avatar { background: linear-gradient(135deg, var(--coral), var(--blue)); }
+.account-nav button[aria-selected='true'] { background: var(--blue-soft); color: var(--blue-dark); }
+.link-item:hover { border-color: var(--blue); background: #fff8fa; }
+.suggest-item { background: #fff8f4; }
+.spinner { border-top-color: var(--blue); }
+.tag { background: var(--card-pink); color: var(--blue-dark); }
+.cover-pick label:has(input:checked) { border-color: var(--blue); }
+
+.site-footer { background: var(--footer); color: var(--ink-2); border-top: 1px solid #f7d6b8; }
+.site-footer h3 { color: var(--ink); }
+.site-footer a { color: var(--ink-2); }
+.site-footer a:hover { color: var(--coral); }
+.site-footer .copy { border-top-color: #f0d0b0; color: #7a635d; }
+.toast { background: var(--ink); }
+
+/* language switcher */
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.header-right .header-actions { margin-left: 0; }
+.lang-switch { position: relative; }
+.lang-btn { display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid var(--card-pink); background: #fff; color: var(--ink-2); border-radius: 999px; padding: 6px 10px; font-weight: 800; font-size: 13px; cursor: pointer; }
+.lang-btn:hover { border-color: var(--blue); color: var(--blue-dark); }
+.lang-btn .svg { width: 18px; height: 18px; color: var(--blue); }
+.lang-menu { position: absolute; right: 0; top: calc(100% + 6px); background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); list-style: none; margin: 0; padding: 6px; min-width: 170px; z-index: 60; }
+.lang-menu button { width: 100%; display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 9px 10px; border-radius: 10px; cursor: pointer; font-weight: 700; color: var(--ink); text-align: left; }
+.lang-menu button:hover { background: var(--blue-soft); }
+.lang-menu button[aria-checked='true'] { color: var(--blue-dark); }
+.lang-menu .svg { width: 16px; height: 16px; }
+
+/* photo credit */
+.detail-figure { margin: 0; }
+.photo-credit { font-size: 11.5px; color: var(--muted); text-align: right; margin-top: 6px; }
+.photo-credit a { color: var(--muted); text-decoration: underline; }
+.ja-text { color: var(--ink-2); }
+
+@media (max-width: 520px) {
+  .lang-btn { padding: 5px 7px; }
+  .lang-btn span { display: none; }
+}
+.thumb img, .detail-hero img, .article-cover img { color: transparent; }
+.nav-auth { display: none; }
+@media (max-width: 520px) {
+  .header-actions .btn { display: none; }
+  .nav.open .nav-auth { display: block; }
+  .brand { font-size: 15px; }
 }

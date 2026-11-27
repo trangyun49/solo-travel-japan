@@ -13,7 +13,10 @@ const authLimiter = rateLimit({
   limit: 20,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
-  message: { error: '試行回数が多すぎます。しばらくしてから再度お試しください。' },
+  handler: (req, res) => {
+    const { langOf, translate } = require('../i18n');
+    res.status(429).json({ error: translate('試行回数が多すぎます。しばらくしてから再度お試しください。', langOf(req)) });
+  },
 });
 
 const now = () => new Date().toISOString();

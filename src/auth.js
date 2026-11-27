@@ -43,7 +43,10 @@ async function attachUser(req, _res, next) {
 }
 
 function requireAuth(req, res, next) {
-  if (!req.user) return res.status(401).json({ error: 'ログインが必要です。' });
+  if (!req.user) {
+    const { HttpError } = require('./validate');
+    throw new HttpError(401, 'ログインが必要です。');
+  }
   next();
 }
 

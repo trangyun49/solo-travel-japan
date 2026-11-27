@@ -1,9 +1,12 @@
 (function () {
   'use strict';
-  const { qs, qsa, api, params, esc, getMe, requireLogin, placeCard, fmtDate, POST_CAT, showAlert, setFormBusy, toast } = window.STJ;
+  const { qs, qsa, api, params, esc, getMe, requireLogin, placeCard, fmtDate, POST_CAT, showAlert, setFormBusy, toast, t, lang, postTitle } = window.STJ;
   const root = qs('#account');
   let cities = [];
-  const cityName = (k) => (cities.find((c) => c.key === k) || {}).name || k;
+  const cityName = (k) => {
+    const c = cities.find((x) => x.key === k);
+    return c ? (lang === 'ja' ? c.name : c.en) : k;
+  };
 
   function switchTab(tab) {
     qsa('[role="tab"]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
@@ -17,7 +20,7 @@
   function fillProfile(u, stats) {
     qs('#p-avatar').textContent = u.displayName.slice(0, 1);
     qs('#p-name').textContent = u.displayName;
-    qs('#p-since').textContent = fmtDate(u.createdAt) + ' 登録';
+    qs('#p-since').textContent = t('joined', { d: fmtDate(u.createdAt) });
     qs('#displayName').value = u.displayName;
     qs('#email').value = u.email;
     qs('#homeCity').value = u.homeCity || '';
@@ -35,7 +38,7 @@
     const favs = new Set(places.map((p) => p.slug));
     box.innerHTML = places.length
       ? places.map((p) => placeCard(p, { favorites: favs })).join('')
-      : '<div class="empty"><b>お気に入りはまだありません</b><a href="/places">スポットを探して</a>、♡ボタンで保存しましょう。</div>';
+      : `<div class="empty"><b>${t('fav_empty')}</b><a href="/places">${t('fav_empty2')}</a></div>`;
   }
 
   async function loadHistory() {
@@ -46,11 +49,11 @@
     box.innerHTML = history.length
       ? history
           .map(
-            (h) => `<div class="list-row"><span><b>${esc(cityName(h.from_city))} → ${esc(cityName(h.to_city))}</b><br><span class="note">出発日 ${esc(h.travel_date)}・検索日 ${fmtDate(h.created_at)}</span></span>
-            <a class="btn btn-outline btn-sm" href="/search?from=${h.from_city}&to=${h.to_city}${h.travel_date >= today ? '&date=' + h.travel_date : ''}">${h.travel_date >= today ? 'もう一度検索' : '日付を変えて検索'}</a></div>`
+            (h) => `<div class="list-row"><span><b>${esc(cityName(h.from_city))} → ${esc(cityName(h.to_city))}</b><br><span class="note">${t('history_row', { d: esc(h.travel_date), s: fmtDate(h.created_at) })}</span></span>
+            <a class="btn btn-outline btn-sm" href="/search?from=${h.from_city}&to=${h.to_city}${h.travel_date >= today ? '&date=' + h.travel_date : ''}">${h.travel_date >= today ? t('search_again') : t('search_new_date')}</a></div>`
           )
           .join('')
-      : '<div class="empty"><b>検索履歴はありません</b><a href="/search">旅を検索</a>すると、ここに保存されます。</div>';
+      : `<div class="empty"><b>${t('history_empty')}</b><a href="/search">${t('history_empty2')}</a></div>`;
   }
 
   async function loadPosts() {
@@ -60,21 +63,21 @@
     box.innerHTML = posts.length
       ? posts
           .map(
-            (p) => `<div class="list-row"><span><a href="/post?slug=${encodeURIComponent(p.slug)}"><b>${esc(p.title)}</b></a><br><span class="note">${esc(POST_CAT[p.category])}・${fmtDate(p.created_at)}</span></span>
-            <span class="post-actions mt0"><a class="btn btn-outline btn-sm" href="/write?slug=${encodeURIComponent(p.slug)}">編集</a><button class="btn btn-danger btn-sm" type="button" data-del="${esc(p.slug)}">削除</button></span></div>`
+            (p) => `<div class="list-row"><span><a href="/post?slug=${encodeURIComponent(p.slug)}"><b>${esc(postTitle(p))}</b></a><br><span class="note">${esc(POST_CAT[p.category])} · ${fmtDate(p.created_at)}</span></span>
+            <span class="post-actions mt0"><a class="btn btn-outline btn-sm" href="/write?slug=${encodeURIComponent(p.slug)}">${t('edit')}</a><button class="btn btn-danger btn-sm" type="button" data-del="${esc(p.slug)}">${t('del')}</button></span></div>`
           )
           .join('')
-      : '<div class="empty"><b>まだ記事を投稿していません</b>あなたのひとり旅の体験を<a href="/write">書いてみましょう</a>。</div>';
+      : `<div class="empty"><b>${t('my_posts_empty')}</b><a href="/write">${t('my_posts_empty2')}</a></div>`;
   }
 
   qs('#post-list').addEventListener('click', async (e) => {
     const b = e.target.closest('[data-del]');
     if (!b) return;
-    if (!confirm('この記事を削除します。元に戻せません。よろしいですか？')) return;
+    if (!confirm(t('confirm_delete_post'))) return;
     b.disabled = true;
     try {
       await api('/posts/' + encodeURIComponent(b.dataset.del), { method: 'DELETE', body: {} });
-      toast('記事を削除しました');
+      toast(t('post_deleted'));
       loadPosts();
     } catch (err) {
       toast(err.message);
@@ -98,7 +101,7 @@
       });
       fillProfile(user);
       getMe(true);
-      showAlert(msg, 'プロフィールを保存しました。', 'ok');
+      showAlert(msg, t('profile_saved'), 'ok');
       const chip = qs('.user-chip .name');
       if (chip) chip.textContent = user.displayName;
     } catch (err) {
@@ -120,7 +123,7 @@
         body: { currentPassword: qs('#currentPassword').value, newPassword: qs('#newPassword').value },
       });
       form.reset();
-      showAlert(msg, 'パスワードを変更しました。', 'ok');
+      showAlert(msg, t('pw_changed'), 'ok');
     } catch (err) {
       showAlert(msg, err.message);
     } finally {
@@ -137,7 +140,7 @@
     e.preventDefault();
     const form = e.currentTarget;
     const msg = qs('#delete-msg');
-    if (!confirm('本当にアカウントを削除しますか？ この操作は元に戻せません。')) return;
+    if (!confirm(t('confirm_delete_account'))) return;
     setFormBusy(form, true);
     try {
       await api('/account', { method: 'DELETE', body: { password: qs('#deletePassword').value } });
@@ -163,7 +166,7 @@
     if (!me) return requireLogin();
     const [acc, c] = await Promise.all([api('/account'), api('/trips/cities')]);
     cities = c.cities;
-    qs('#homeCity').insertAdjacentHTML('beforeend', cities.map((x) => `<option value="${x.key}">${esc(x.name)}</option>`).join(''));
+    qs('#homeCity').insertAdjacentHTML('beforeend', cities.map((x) => `<option value="${x.key}">${esc(lang === 'ja' ? x.name : x.en)}</option>`).join(''));
     fillProfile(acc.user, acc.stats);
     root.hidden = false;
     const tab = params().get('tab');

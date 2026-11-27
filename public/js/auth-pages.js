@@ -1,6 +1,6 @@
 (function () {
   'use strict';
-  const { qs, api, params, getMe, showAlert, setFormBusy } = window.STJ;
+  const { qs, api, params, getMe, showAlert, setFormBusy, t } = window.STJ;
   const form = qs('#login-form');
   const err = qs('#auth-error');
   const mode = form.dataset.mode;
@@ -22,11 +22,11 @@
     let msg = '';
     if (mode === 'register') {
       body.displayName = qs('#displayName').value.trim();
-      if (!body.displayName) msg = 'ニックネームを入力してください。';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) msg = 'メールアドレスの形式が正しくありません。';
-      else if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) msg = 'パスワードは8文字以上で、英字と数字を両方含めてください。';
+      if (!body.displayName) msg = t('err_nick');
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) msg = t('err_email');
+      else if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) msg = t('err_pw');
     } else if (!email || !password) {
-      msg = 'メールアドレスとパスワードを入力してください。';
+      msg = t('err_login_empty');
     }
     if (msg) return showAlert(err, msg);
     showAlert(err, '');

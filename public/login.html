@@ -6,10 +6,11 @@
 <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@500;600;700;800;900&display=swap">
 <link rel="stylesheet" href="/css/app.css">
+<script src="/js/i18n.js" defer></script>
 <script src="/js/common.js" defer></script>
-<title>ログイン｜ひとり旅ジャパン</title>
+<title data-i18n="t_login">ログイン｜ひとり旅ジャパン</title>
 <script src="/js/auth-pages.js" defer></script>
 </head>
 <body>
@@ -17,23 +18,23 @@
 <main>
   <form class="auth-wrap form-grid" id="login-form" data-mode="login" novalidate>
     <div>
-      <h1>ログイン</h1>
-      <p class="hint">お気に入りや検索履歴の保存、体験記の投稿ができます。</p>
+      <h1 data-i18n="login">ログイン</h1>
+      <p class="hint" data-i18n="login_lead">お気に入りや検索履歴の保存、体験記の投稿ができます。</p>
     </div>
     <p class="alert alert-error" id="auth-error" hidden></p>
     <div class="field">
-      <label for="email">メールアドレス</label>
+      <label for="email" data-i18n="email">メールアドレス</label>
       <input class="input" type="email" id="email" name="email" autocomplete="email" required>
     </div>
     <div class="field">
-      <label for="password">パスワード</label>
+      <label for="password" data-i18n="password">パスワード</label>
       <div class="pw-wrap">
         <input class="input" type="password" id="password" name="password" autocomplete="current-password" required>
-        <button type="button" class="pw-toggle" aria-label="パスワードの表示切替">表示</button>
+        <button type="button" class="pw-toggle" aria-label="パスワードの表示切替" data-i18n-aria="pw_toggle" data-i18n="show">表示</button>
       </div>
     </div>
-    <button class="btn btn-primary btn-lg" type="submit">ログイン</button>
-    <p class="auth-foot">アカウントをお持ちでない方は <a href="/register" id="switch-link">新規登録</a></p>
+    <button class="btn btn-primary btn-lg" type="submit" data-i18n="login">ログイン</button>
+    <p class="auth-foot"><span data-i18n="no_account">アカウントをお持ちでない方は</span> <a href="/register" id="switch-link" data-i18n="register">新規登録</a></p>
   </form>
 </main>
 <div id="site-footer"></div>

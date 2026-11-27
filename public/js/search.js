@@ -1,17 +1,24 @@
 (function () {
   'use strict';
-  const { qs, api, params, icon, esc, placeCard, getMe, REGION } = window.STJ;
+  const { qs, api, params, icon, esc, placeCard, getMe, REGION, t, lang } = window.STJ;
   const out = qs('#results');
   const MODE_ICON = { flight: 'plane', bus: 'bus', train: 'train' };
   const yen = (n) => '¥' + Number(n).toLocaleString('ja-JP');
-  const hm = (min) => (min ? `${Math.floor(min / 60)}時間${min % 60 ? (min % 60) + '分' : ''}` : '');
+  const hm = (min) => (min ? t('hm', { h: Math.floor(min / 60), m: min % 60 }) : '');
   const timeOf = (s) => (s ? String(s).slice(11, 16) : '');
+  const cn = (c) => (lang === 'ja' ? c.name : c.en || c.name);
+  const locale = lang === 'ja' ? 'ja-JP' : lang === 'vi' ? 'vi-VN' : 'en-GB';
 
-  function linkList(links) {
+  function linkLabel(l, ctx) {
+    if (lang === 'ja') return l.label;
+    return t('lk_' + l.kind, { c: cn(ctx.to) });
+  }
+
+  function linkList(links, ctx) {
     return `<div class="link-list">${links
       .map(
         (l) => `<a class="link-item" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">
-          <span><b>${esc(l.provider)}</b><span>${esc(l.label)}</span></span>${icon('ext')}</a>`
+          <span><b>${esc(l.provider)}</b><span>${esc(linkLabel(l, ctx))}</span></span>${icon('ext')}</a>`
       )
       .join('')}</div>`;
   }
@@ -20,12 +27,12 @@
     const f = d.flights;
     const links = d.links.flight;
     if (!links.length) {
-      const reason = !d.from.airports.length || !d.to.airports.length ? '出発地または目的地の近くに空港がないため、' : '同じ空港圏内の移動のため、';
-      return `<section class="panel" data-mode="flight"><div class="panel-head"><h2>${icon('plane')} 航空券</h2></div>
-        <div class="panel-body"><p class="note">${reason}この区間は飛行機の対象外です。鉄道・バスをご利用ください。</p></div></section>`;
+      const reason = !d.from.airports.length || !d.to.airports.length ? t('no_airport') : t('same_airport');
+      return `<section class="panel" data-mode="flight"><div class="panel-head"><h2>${icon('plane')} ${t('p_flight')}</h2></div>
+        <div class="panel-body"><p class="note">${reason}</p></div></section>`;
     }
     let body = '';
-    const notes = [d.from.airportNote, d.to.airportNote].filter(Boolean).map((n) => `<p class="note">${esc(n)}</p>`).join('');
+    const notes = lang === 'ja' ? [d.from.airportNote, d.to.airportNote].filter(Boolean).map((n) => `<p class="note">${esc(n)}</p>`).join('') : '';
     if (f.available) {
       const rows = f.results.length
         ? f.results
@@ -34,40 +41,42 @@
           ${r.logo ? `<img src="${esc(r.logo)}" alt="" loading="lazy">` : '<span></span>'}
           <div>
             <div class="flight-times">${esc(timeOf(r.departure.time))} ${esc(r.departure.airport || '')} → ${esc(timeOf(r.arrival.time))} ${esc(r.arrival.airport || '')}</div>
-            <div class="flight-sub">${esc(r.airlines.join(' / '))}${r.flightNumbers.length ? '（' + esc(r.flightNumbers.join(', ')) + '）' : ''}・${hm(r.totalMinutes)}・${r.stops ? '乗継' + r.stops + '回' : '直行便'}</div>
+            <div class="flight-sub">${esc(r.airlines.join(' / '))}${r.flightNumbers.length ? ' (' + esc(r.flightNumbers.join(', ')) + ')' : ''} · ${hm(r.totalMinutes)} · ${r.stops ? t('stops', { n: r.stops }) : t('direct')}</div>
           </div>
-          <div class="price">${yen(r.price)}<small>大人1名・片道</small></div>
+          <div class="price">${yen(r.price)}<small>${t('per_adult')}</small></div>
         </div>`
             )
             .join('')
-        : '<p class="note">この日の便は見つかりませんでした。日付を変えるか、下の予約サイトでご確認ください。</p>';
-      const fetched = new Date(f.fetchedAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
-      body = `<p class="note">Google フライトの最新運賃（${esc(fetched)} 取得）。価格は変動するため、予約サイトで最終確認してください。</p>${rows}
-        ${f.searchUrl ? `<p class="note"><a href="${esc(f.searchUrl)}" target="_blank" rel="noopener noreferrer">Google フライトで全ての便を見る</a></p>` : ''}`;
+        : `<p class="note">${t('no_flights_day')}</p>`;
+      const fetched = new Date(f.fetchedAt).toLocaleString(locale, { timeZone: 'Asia/Tokyo' });
+      body = `<p class="note">${t('fares_live', { t: esc(fetched) })}</p>${rows}
+        ${f.searchUrl ? `<p class="note"><a href="${esc(f.searchUrl)}" target="_blank" rel="noopener noreferrer">${t('all_flights')}</a></p>` : ''}`;
     } else {
-      const why =
-        f.reason === 'provider_error'
-          ? `リアルタイム運賃の取得に失敗しました（${esc(f.message || '')}）。下の予約サイトで最新の運賃をご確認ください。`
-          : 'このサイトでは運賃の推測値は表示していません。下の予約サイトで、この区間・日付・大人1名の最新運賃と空席を確認できます。';
+      const why = f.reason === 'provider_error' ? t('fares_error', { m: esc(f.message || '') }) : t('no_fares');
       body = `<p class="alert alert-info">${why}</p>`;
     }
     return `<section class="panel" data-mode="flight">
-      <div class="panel-head"><h2>${icon('plane')} 航空券</h2>${f.available && f.lowest ? `<span class="note">最安 ${yen(f.lowest)}〜</span>` : ''}</div>
-      <div class="panel-body">${notes}${body}<h3 class="sr-only">予約サイト</h3><div class="mt">${linkList(links)}</div></div>
+      <div class="panel-head"><h2>${icon('plane')} ${t('p_flight')}</h2>${f.available && f.lowest ? `<span class="note">${t('lowest_from', { p: yen(f.lowest) })}</span>` : ''}</div>
+      <div class="panel-body">${notes}${body}<div class="mt">${linkList(links, d)}</div></div>
     </section>`;
   }
 
-  function simplePanel(mode, title, links, emptyMsg, note) {
+  function simplePanel(mode, title, links, emptyMsg, note, d) {
     return `<section class="panel" data-mode="${mode}">
       <div class="panel-head"><h2>${icon(MODE_ICON[mode])} ${title}</h2></div>
-      <div class="panel-body">${links.length ? (note ? `<p class="note mb">${note}</p>` : '') + linkList(links) : `<p class="note">${emptyMsg}</p>`}</div>
+      <div class="panel-body">${links.length ? `<p class="note mb">${note}</p>` + linkList(links, d) : `<p class="note">${emptyMsg}</p>`}</div>
     </section>`;
+  }
+
+  function suggestionText(s) {
+    if (lang === 'ja' || !s.key) return [s.title, s.note];
+    return t('sg_' + s.key);
   }
 
   async function run() {
     const p = params();
     if (!p.get('from') || !p.get('to') || !p.get('date')) return;
-    out.innerHTML = '<div class="spinner" role="status" aria-label="検索中"></div>';
+    out.innerHTML = `<div class="spinner" role="status" aria-label="${t('loading')}"></div>`;
     let d;
     try {
       d = await api(`/trips/search?from=${encodeURIComponent(p.get('from'))}&to=${encodeURIComponent(p.get('to'))}&date=${encodeURIComponent(p.get('date'))}`);
@@ -75,45 +84,48 @@
       out.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
       return;
     }
-    document.title = `${d.from.name} → ${d.to.name}｜旅を検索｜ひとり旅ジャパン`;
-    const dateLabel = new Date(d.date + 'T00:00:00').toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+    document.title = `${cn(d.from)} → ${cn(d.to)}${t('suffix')}`;
+    const dateLabel = new Date(d.date + 'T00:00:00').toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
 
     const suggest = d.suggestions
-      .map((s) => `<div class="suggest-item"><span class="mode-icon">${icon(MODE_ICON[s.mode])}</span><span><b>${esc(s.title)}</b><span>${esc(s.note)}</span></span></div>`)
+      .map((s) => {
+        const [title, note] = suggestionText(s);
+        return `<div class="suggest-item"><span class="mode-icon">${icon(MODE_ICON[s.mode])}</span><span><b>${esc(title)}</b><span>${esc(note)}</span></span></div>`;
+      })
       .join('');
 
     out.innerHTML = `
       <div class="route-summary">
-        <div class="cities">${esc(d.from.name)} ${icon('plane')} ${esc(d.to.name)}</div>
-        <div class="meta"><span>${icon('clock')} ${esc(dateLabel)}</span><span>${icon('solo')} 大人1名・片道</span><span>${icon('map')} 直線距離 約${d.distanceKm.toLocaleString()}km</span></div>
+        <div class="cities">${esc(cn(d.from))} ${icon('plane')} ${esc(cn(d.to))}</div>
+        <div class="meta"><span>${icon('clock')} ${esc(dateLabel)}</span><span>${icon('solo')} ${t('one_way')}</span><span>${icon('map')} ${t('distance', { n: d.distanceKm.toLocaleString() })}</span></div>
       </div>
-      <div class="mode-tabs chips" role="group" aria-label="表示する移動手段">
-        <button class="chip" type="button" data-show="all" aria-pressed="true">すべて</button>
-        <button class="chip" type="button" data-show="flight" aria-pressed="false">飛行機</button>
-        <button class="chip" type="button" data-show="bus" aria-pressed="false">高速バス</button>
-        <button class="chip" type="button" data-show="train" aria-pressed="false">新幹線・鉄道</button>
+      <div class="mode-tabs chips" role="group" aria-label="${t('show_modes')}">
+        <button class="chip" type="button" data-show="all" aria-pressed="true">${t('m_all')}</button>
+        <button class="chip" type="button" data-show="flight" aria-pressed="false">${t('m_flight')}</button>
+        <button class="chip" type="button" data-show="bus" aria-pressed="false">${t('m_bus')}</button>
+        <button class="chip" type="button" data-show="train" aria-pressed="false">${t('m_train')}</button>
       </div>
       <div class="results-layout">
         <div>
           <section class="panel" data-mode="all">
-            <div class="panel-head"><h2>移動手段の目安</h2><span class="note">距離から判定した参考情報です</span></div>
+            <div class="panel-head"><h2>${t('mode_guide')}</h2><span class="note">${t('mode_guide_note')}</span></div>
             <div class="panel-body"><div class="suggest">${suggest}</div></div>
           </section>
           ${flightPanel(d)}
-          ${simplePanel('bus', '高速バス・夜行バス', d.links.bus, 'この区間は高速バスの対象外です（海を渡る区間など）。', '日付指定で各社の便・運賃・残席を比較できます。')}
-          ${simplePanel('train', '新幹線・鉄道', d.links.train, 'この区間は鉄道でつながっていません。', '乗換案内で時刻・所要時間・運賃を確認し、予約サイトで指定席を予約できます。')}
+          ${simplePanel('bus', t('p_bus'), d.links.bus, t('bus_empty'), t('bus_note'), d)}
+          ${simplePanel('train', t('p_train'), d.links.train, t('train_empty'), t('train_note'), d)}
         </div>
         <aside>
           <section class="panel">
-            <div class="panel-head"><h2>${icon('hotel')} ${esc(d.to.name)}の宿</h2></div>
-            <div class="panel-body"><p class="note mb">チェックイン ${esc(d.date)}・1泊・大人1名で検索します。</p>${linkList(d.links.hotel)}</div>
+            <div class="panel-head"><h2>${icon('hotel')} ${t('hotels_in', { c: esc(cn(d.to)) })}</h2></div>
+            <div class="panel-body"><p class="note mb">${t('hotel_note', { d: esc(d.date) })}</p>${linkList(d.links.hotel, d)}</div>
           </section>
           <section class="panel">
-            <div class="panel-head"><h2>${esc(REGION[d.to.region])}のスポット</h2></div>
+            <div class="panel-head"><h2>${t('spots_in', { r: esc(REGION[d.to.region]) })}</h2></div>
             <div class="panel-body" id="dest-places"><div class="spinner"></div></div>
           </section>
           <section class="panel" id="history-panel" hidden>
-            <div class="panel-head"><h2>最近の検索</h2></div>
+            <div class="panel-head"><h2>${t('recent_searches')}</h2></div>
             <div class="panel-body" id="history-list"></div>
           </section>
         </aside>
@@ -132,14 +144,17 @@
     api(`/places?region=${d.to.region}&sort=solo&limit=3`).then(({ places }) => {
       qs('#dest-places').innerHTML = places.length
         ? `<div class="grid">${places.map((x) => placeCard(x)).join('')}</div>`
-        : '<p class="note">このエリアのスポットはまだありません。</p>';
+        : `<p class="note">${t('no_spots_area')}</p>`;
     });
 
     const me = await getMe();
     if (me) {
       const { history } = await api('/account/history');
       const cities = await window.STJ.citiesReady;
-      const name = (k) => (cities.find((c) => c.key === k) || {}).name || k;
+      const name = (k) => {
+        const c = cities.find((x) => x.key === k);
+        return c ? cn(c) : k;
+      };
       if (history.length) {
         qs('#history-panel').hidden = false;
         qs('#history-list').innerHTML = history

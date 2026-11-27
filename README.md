@@ -2,6 +2,8 @@
 
 Website du lịch dành cho người đi du lịch một mình tại Nhật Bản: tìm hành trình (máy bay / xe bus đường dài / tàu Shinkansen / khách sạn), gợi ý địa điểm theo mùa – tháng – khu vực, blog chia sẻ kinh nghiệm và tài khoản người dùng.
 
+Giao diện 3 ngôn ngữ (日本語 / Tiếng Việt / English, nút quả cầu ở góc phải trên). Ảnh địa điểm lấy từ Wikimedia Commons (giấy phép CC, có ghi nguồn ở trang chi tiết).
+
 ## Công nghệ
 
 | Phần | Công nghệ |
@@ -60,8 +62,9 @@ src/
   auth.js            # phiên đăng nhập (JWT cookie)
   validate.js
   routes/            # auth, account, places, posts, trips
-  data/              # cities, places, posts (nội dung mẫu), meta
-public/              # trang HTML, css/app.css, js/*.js, img/
+  data/              # cities, places, posts, photos (Wikimedia), *-i18n (bản dịch VI/EN), meta
+  i18n.js            # dịch thông báo lỗi API theo ngôn ngữ (header X-Lang / cookie stj_lang)
+public/              # trang HTML, css/app.css, js/i18n.js (từ điển giao diện), js/*.js, img/
 scripts/smoke-test.js
 ```
 

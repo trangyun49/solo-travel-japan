@@ -2,13 +2,20 @@
 (function () {
   'use strict';
 
-  // ---------- Labels ----------
-  const REGION = { hokkaido: '北海道', tohoku: '東北', kanto: '関東', chubu: '中部', kansai: '関西', chugoku: '中国', shikoku: '四国', kyushu: '九州', okinawa: '沖縄' };
-  const CATEGORY = { sightseeing: '観光スポット', gourmet: 'グルメ', cafe: 'カフェ', onsen: '温泉' };
+  // ---------- Labels (localized) ----------
+  const { t, lang, pick } = window.I18N;
+  const labels = (prefix, keys) => Object.fromEntries(keys.map((k) => [k, t(prefix + k)]));
+  const REGION = labels('region_', ['hokkaido', 'tohoku', 'kanto', 'chubu', 'kansai', 'chugoku', 'shikoku', 'kyushu', 'okinawa']);
+  const CATEGORY = labels('cat_', ['sightseeing', 'gourmet', 'cafe', 'onsen']);
   const CAT_KANJI = { sightseeing: '観', gourmet: '食', cafe: '珈', onsen: '湯' };
-  const SEASON = { spring: '春', summer: '夏', autumn: '秋', winter: '冬', all: '通年' };
+  const SEASON = labels('season_', ['spring', 'summer', 'autumn', 'winter', 'all']);
   const SEASON_MONTHS = { spring: [3, 4, 5], summer: [6, 7, 8], autumn: [9, 10, 11], winter: [12, 1, 2] };
-  const POST_CAT = { solo: 'ひとり旅', tips: '旅のコツ', gourmet: 'グルメ', sightseeing: '観光', experience: '体験記' };
+  const POST_CAT = labels('pcat_', ['solo', 'tips', 'gourmet', 'sightseeing', 'experience']);
+  const placeName = (p) => pick(p, 'name', 'name_en', 'name_vi');
+  const placeSummary = (p) => pick(p, 'summary', 'summary_en', 'summary_vi');
+  const postTitle = (p) => pick(p, 'title', 'title_en', 'title_vi');
+  const postExcerpt = (p) => pick(p, 'excerpt', 'excerpt_en', 'excerpt_vi');
+  const authorName = (p) => (p.author_id ? p.author_name : t('editorial'));
   const COVERS = ['tokyo.jpg', 'osaka-castle.jpg', 'otaru.jpg', 'onsen.jpg', 'shibuya-kinkakuji.jpg', 'harajuku-cafe.jpg', 'jr-pass.jpg', 'usj.jpg'];
 
   function seasonOf(m) {
@@ -36,6 +43,8 @@
     solo: '<circle cx="12" cy="6" r="3"/><path d="M12 9v6M9 21l3-6 3 6M8 12h8"/>',
     filter: '<path d="M4 5h16l-6 8v6l-4-2v-4z"/>',
     map: '<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>',
+    check: '<path d="M5 12l5 5 9-10"/>',
   };
   function icon(name, cls = 'svg') {
     return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
@@ -48,10 +57,7 @@
   const qs = (sel, root = document) => root.querySelector(sel);
   const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const params = () => new URLSearchParams(location.search);
-  function fmtDate(iso) {
-    const d = new Date(iso);
-    return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-  }
+  const fmtDate = window.I18N.fmtDate;
   function todayJst() {
     return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
   }
@@ -81,7 +87,7 @@
 
   // ---------- API ----------
   async function api(path, opts = {}) {
-    const init = { method: opts.method || 'GET', headers: {}, credentials: 'same-origin' };
+    const init = { method: opts.method || 'GET', headers: { 'X-Lang': lang }, credentials: 'same-origin' };
     if (opts.body !== undefined) {
       init.headers['Content-Type'] = 'application/json';
       init.body = JSON.stringify(opts.body);
@@ -90,14 +96,14 @@
     try {
       res = await fetch('/api' + path, init);
     } catch (_) {
-      throw new Error('通信できませんでした。ネットワーク接続を確認してください。');
+      throw new Error(t('network_error'));
     }
     let data = {};
     try {
       data = await res.json();
     } catch (_) {}
     if (!res.ok) {
-      const err = new Error(data.error || `エラーが発生しました（${res.status}）`);
+      const err = new Error(data.error || `Error ${res.status}`);
       err.status = res.status;
       throw err;
     }
@@ -116,11 +122,21 @@
 
   // ---------- Layout ----------
   const NAV = [
-    { href: '/search', label: '旅を検索' },
-    { href: '/places', label: 'スポット' },
-    { href: '/places?featured=1', label: 'おすすめ' },
-    { href: '/blog', label: 'ブログ' },
+    { href: '/search', label: t('nav_search') },
+    { href: '/places', label: t('nav_places') },
+    { href: '/places?featured=1', label: t('nav_featured') },
+    { href: '/blog', label: t('nav_blog') },
   ];
+  function langSwitcher() {
+    const L = window.I18N.LANGS;
+    const items = Object.keys(L)
+      .map((k) => `<li role="none"><button type="button" role="menuitemradio" aria-checked="${k === lang}" data-lang="${k}">${k === lang ? icon('check') : '<span class="svg"></span>'} ${L[k]}</button></li>`)
+      .join('');
+    return `<div class="lang-switch">
+      <button type="button" class="lang-btn" id="lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="${t('language')}">${icon('globe')}<span>${lang.toUpperCase()}</span></button>
+      <ul class="lang-menu" id="lang-menu" role="menu" hidden>${items}</ul>
+    </div>`;
+  }
   function renderHeader() {
     const host = qs('#site-header');
     if (!host) return;
@@ -133,15 +149,36 @@
     host.outerHTML = `
 <header class="site-header">
   <div class="wrap">
-    <a class="brand" href="/" aria-label="ひとり旅ジャパン ホーム">
+    <a class="brand" href="/" aria-label="${t('brand')}">
       <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16" stroke="#e0452b" stroke-width="2.4" stroke-linecap="round"/><path d="M6 10.5h12" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><path d="M8 7v12M16 7v12" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></span>
-      <span>ひとり旅ジャパン<small>Solo Travel Japan</small></span>
+      <span>${t('brand')}<small>${t('brand_sub')}</small></span>
     </a>
-    <nav class="nav" id="main-nav" aria-label="メインメニュー">${navHtml}</nav>
-    <div class="header-actions" id="header-actions"></div>
-    <button class="menu-btn" id="menu-btn" aria-label="メニューを開く" aria-expanded="false" aria-controls="main-nav">${icon('menu')}</button>
+    <nav class="nav" id="main-nav" aria-label="Menu">${navHtml}</nav>
+    <div class="header-right">
+      ${langSwitcher()}
+      <div class="header-actions" id="header-actions"></div>
+      <button class="menu-btn" id="menu-btn" aria-label="${t('menu_open')}" aria-expanded="false" aria-controls="main-nav">${icon('menu')}</button>
+    </div>
   </div>
 </header>`;
+    const lb = qs('#lang-btn');
+    const lm = qs('#lang-menu');
+    lb.addEventListener('click', (e) => {
+      e.stopPropagation();
+      lm.hidden = !lm.hidden;
+      lb.setAttribute('aria-expanded', String(!lm.hidden));
+    });
+    lm.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-lang]');
+      if (b) window.I18N.setLang(b.dataset.lang);
+    });
+    document.addEventListener('click', () => {
+      lm.hidden = true;
+      lb.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') lm.hidden = true;
+    });
     qs('#menu-btn').addEventListener('click', (e) => {
       const nav = qs('#main-nav');
       const open = nav.classList.toggle('open');
@@ -150,9 +187,10 @@
     getMe().then((user) => {
       const box = qs('#header-actions');
       if (user) {
-        box.innerHTML = `<a class="user-chip" href="/account" title="マイページ"><span class="avatar">${esc(user.displayName.slice(0, 1))}</span><span class="name">${esc(user.displayName)}</span></a>`;
+        box.innerHTML = `<a class="user-chip" href="/account" title="${t('mypage')}"><span class="avatar">${esc(user.displayName.slice(0, 1))}</span><span class="name">${esc(user.displayName)}</span></a>`;
       } else {
-        box.innerHTML = `<a class="btn btn-ghost btn-sm" href="/login">ログイン</a><a class="btn btn-primary btn-sm" href="/register">新規登録</a>`;
+        box.innerHTML = `<a class="btn btn-ghost btn-sm" href="/login">${t('login')}</a><a class="btn btn-primary btn-sm" href="/register">${t('register')}</a>`;
+        qs('#main-nav').insertAdjacentHTML('beforeend', `<a class="nav-auth" href="/login">${t('login')}</a><a class="nav-auth" href="/register">${t('register')}</a>`);
       }
     });
   }
@@ -164,28 +202,28 @@
 <footer class="site-footer">
   <div class="wrap">
     <div>
-      <h3>ひとり旅ジャパン</h3>
-      <p>日本をひとりで旅する人のための、移動検索とスポット・ブログのガイドです。料金・空席は各予約サイトでご確認ください。</p>
+      <h3>${t('brand')}</h3>
+      <p>${t('foot_about')}</p>
     </div>
     <div>
-      <h3>さがす</h3>
+      <h3>${t('foot_find')}</h3>
       <ul>
-        <li><a href="/search">旅を検索（航空券・バス・鉄道）</a></li>
-        <li><a href="/places">スポット一覧</a></li>
-        <li><a href="/places?category=gourmet">グルメ</a></li>
-        <li><a href="/places?category=sightseeing">観光スポット</a></li>
+        <li><a href="/search">${t('foot_search')}</a></li>
+        <li><a href="/places">${t('foot_places')}</a></li>
+        <li><a href="/places?category=gourmet">${CATEGORY.gourmet}</a></li>
+        <li><a href="/places?category=sightseeing">${CATEGORY.sightseeing}</a></li>
       </ul>
     </div>
     <div>
-      <h3>読む・書く</h3>
+      <h3>${t('foot_read')}</h3>
       <ul>
-        <li><a href="/blog">ブログ</a></li>
-        <li><a href="/blog?category=solo">ひとり旅の記事</a></li>
-        <li><a href="/write">体験記を投稿する</a></li>
-        <li><a href="/account">マイページ</a></li>
+        <li><a href="/blog">${t('nav_blog')}</a></li>
+        <li><a href="/blog?category=solo">${t('foot_solo_posts')}</a></li>
+        <li><a href="/write">${t('foot_write')}</a></li>
+        <li><a href="/account">${t('mypage')}</a></li>
       </ul>
     </div>
-    <p class="copy">© ${new Date().getFullYear()} Solo Travel Japan</p>
+    <p class="copy">© ${new Date().getFullYear()} Solo Travel Japan ・ ${t('photo_credit_note')}</p>
   </div>
 </footer>`;
   }
@@ -194,30 +232,32 @@
   function soloMeter(score) {
     let dots = '';
     for (let i = 1; i <= 5; i++) dots += `<i class="${i <= score ? 'on' : ''}"></i>`;
-    return `<span class="solo-meter" title="ひとり旅おすすめ度 ${score}/5" aria-label="ひとり旅おすすめ度 ${score}/5">${dots}</span>`;
+    const label = t('solo_score', { n: score });
+    return `<span class="solo-meter" title="${label}" aria-label="${label}">${dots}</span>`;
   }
 
   function thumb(img, category, nameEn, alt) {
-    if (img) return `<img src="/img/${esc(img)}" alt="${esc(alt || '')}" loading="lazy">`;
+    if (img) return `<img src="${/^https:\/\//.test(img) ? esc(img) : '/img/' + esc(img)}" alt="${esc(alt || '')}" loading="lazy" referrerpolicy="no-referrer">`;
     return `<div class="thumb-fallback cat-${esc(category)}" aria-hidden="true"><span class="kanji">${CAT_KANJI[category] || '旅'}</span><span class="en">${esc(nameEn || '')}</span></div>`;
   }
 
   function placeCard(p, opts = {}) {
     const badges = [];
-    if (p.solo_score >= 5) badges.push('<span class="badge badge-solo">ひとり旅向け</span>');
+    if (p.solo_score >= 5) badges.push(`<span class="badge badge-solo">${t('solo_badge')}</span>`);
     badges.push(`<span class="badge">${esc(CATEGORY[p.category] || '')}</span>`);
     const fav = opts.favorites
-      ? `<button class="fav-btn" type="button" data-fav="${esc(p.slug)}" aria-pressed="${opts.favorites.has(p.slug)}" aria-label="お気に入り">${icon(opts.favorites.has(p.slug) ? 'heartFill' : 'heart')}</button>`
+      ? `<button class="fav-btn" type="button" data-fav="${esc(p.slug)}" aria-pressed="${opts.favorites.has(p.slug)}" aria-label="${t('favorite')}">${icon(opts.favorites.has(p.slug) ? 'heartFill' : 'heart')}</button>`
       : '';
     return `
 <article class="card">
   ${fav}
   <a href="/place?slug=${encodeURIComponent(p.slug)}" class="card-link">
-    <div class="thumb">${thumb(p.image, p.category, p.name_en, p.name)}<div class="badges">${badges.join('')}</div></div>
+    <div class="thumb">${thumb(p.image, p.category, p.name_en, placeName(p))}<div class="badges">${badges.join('')}</div></div>
     <div class="card-body">
-      <div class="card-meta"><span>${icon('pin')} ${esc(REGION[p.region] || '')}・${esc(p.area || p.prefecture)}</span>${soloMeter(p.solo_score)}</div>
-      <h3 class="card-title">${esc(p.name)}</h3>
-      <p class="card-text">${esc(p.summary)}</p>
+      <div class="card-meta"><span>${icon('pin')} ${esc(REGION[p.region] || '')}${lang === 'ja' ? '・' + esc(p.area || p.prefecture) : ''}</span>${soloMeter(p.solo_score)}</div>
+      <h3 class="card-title">${esc(placeName(p))}</h3>
+      ${lang !== 'ja' ? `<p class="card-sub">${esc(p.name)}</p>` : ''}
+      <p class="card-text">${esc(placeSummary(p))}</p>
     </div>
   </a>
 </article>`;
@@ -231,9 +271,9 @@
 <a class="card post-card" href="/post?slug=${encodeURIComponent(p.slug)}">
   <div class="thumb">${cover}<div class="badges"><span class="badge${p.category === 'solo' ? ' badge-solo' : ''}">${esc(POST_CAT[p.category] || '')}</span>${p.season && p.season !== 'all' ? `<span class="badge">${SEASON[p.season]}</span>` : ''}</div></div>
   <div class="card-body">
-    <div class="card-meta"><span>${esc(p.author_name)}</span><span>${fmtDate(p.created_at)}</span>${p.region ? `<span>${esc(REGION[p.region])}</span>` : ''}</div>
-    <h3 class="card-title">${esc(p.title)}</h3>
-    <p class="card-text">${esc(p.excerpt)}</p>
+    <div class="card-meta"><span>${esc(authorName(p))}</span><span>${fmtDate(p.created_at)}</span>${p.region ? `<span>${esc(REGION[p.region])}</span>` : ''}</div>
+    <h3 class="card-title">${esc(postTitle(p))}</h3>
+    <p class="card-text">${esc(postExcerpt(p))}</p>
   </div>
 </a>`;
   }
@@ -291,7 +331,7 @@
     e.preventDefault();
     const me = await getMe();
     if (!me) {
-      toast('お気に入りに保存するにはログインしてください');
+      toast(t('fav_need_login'));
       setTimeout(requireLogin, 900);
       return;
     }
@@ -302,8 +342,8 @@
       await api('/account/favorites/' + encodeURIComponent(slug), { method: on ? 'DELETE' : 'POST', body: {} });
       btn.setAttribute('aria-pressed', String(!on));
       if (btn.classList.contains('fav-btn')) btn.innerHTML = icon(on ? 'heart' : 'heartFill');
-      else btn.innerHTML = `${icon(on ? 'heart' : 'heartFill')} ${on ? 'お気に入りに追加' : 'お気に入り済み'}`;
-      toast(on ? 'お気に入りから外しました' : 'お気に入りに追加しました');
+      else btn.innerHTML = `${icon(on ? 'heart' : 'heartFill')} ${on ? t('fav_add') : t('fav_added')}`;
+      toast(on ? t('fav_toast_off') : t('fav_toast_on'));
       document.dispatchEvent(new CustomEvent('favchange', { detail: { slug, on: !on } }));
     } catch (err) {
       toast(err.message);
@@ -314,12 +354,12 @@
 
   // ---------- Password visibility toggles ----------
   document.addEventListener('click', (e) => {
-    const t = e.target.closest('.pw-toggle');
-    if (!t) return;
-    const input = t.parentElement.querySelector('input');
+    const tg = e.target.closest('.pw-toggle');
+    if (!tg) return;
+    const input = tg.parentElement.querySelector('input');
     const show = input.type === 'password';
     input.type = show ? 'text' : 'password';
-    t.textContent = show ? '隠す' : '表示';
+    tg.textContent = show ? window.I18N.t('hide') : window.I18N.t('show');
   });
 
   function setFormBusy(form, busy) {
@@ -332,7 +372,8 @@
   }
 
   window.STJ = {
-    REGION, CATEGORY, SEASON, SEASON_MONTHS, POST_CAT, COVERS, CAT_KANJI,
+    REGION, CATEGORY, SEASON, SEASON_MONTHS, POST_CAT, COVERS, CAT_KANJI, t, lang,
+    placeName, placeSummary, postTitle, postExcerpt, authorName,
     icon, esc, qs, qsa, params, fmtDate, todayJst, addDays, currentMonthJst, seasonOf, toast,
     api, getMe, requireLogin, placeCard, postCard, thumb, soloMeter, renderMarkdown, loadFavoriteSet,
     setFormBusy, showAlert,

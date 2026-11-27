@@ -1,7 +1,7 @@
 /* Trip search form (home + search page). Always searches for 1 adult. */
 (function () {
   'use strict';
-  const { qs, api, params, todayJst, addDays, getMe, REGION, showAlert } = window.STJ;
+  const { qs, api, params, todayJst, addDays, getMe, REGION, showAlert, t, lang } = window.STJ;
   const form = qs('#trip-form');
   if (!form) return;
   const from = qs('#from', form);
@@ -17,10 +17,10 @@
     const groups = {};
     cities.forEach((c) => (groups[c.region] = groups[c.region] || []).push(c));
     const html =
-      '<option value="">選択してください</option>' +
+      `<option value="">${t('choose')}</option>` +
       Object.keys(REGION)
         .filter((r) => groups[r])
-        .map((r) => `<optgroup label="${REGION[r]}">${groups[r].map((c) => `<option value="${c.key}">${c.name}</option>`).join('')}</optgroup>`)
+        .map((r) => `<optgroup label="${REGION[r]}">${groups[r].map((c) => `<option value="${c.key}">${lang === 'ja' ? c.name : c.en}</option>`).join('')}</optgroup>`)
         .join('');
     from.innerHTML = html;
     to.innerHTML = html;
@@ -47,11 +47,11 @@
 
   form.addEventListener('submit', (e) => {
     let msg = '';
-    if (!from.value) msg = '出発地を選択してください。';
-    else if (!to.value) msg = '目的地を選択してください。';
-    else if (from.value === to.value) msg = '出発地と目的地が同じです。';
-    else if (!date.value || date.value < today) msg = '出発日は今日以降を選択してください。';
-    else if (date.value > date.max) msg = '出発日は約11か月先までを選択してください。';
+    if (!from.value) msg = t('err_from');
+    else if (!to.value) msg = t('err_to');
+    else if (from.value === to.value) msg = t('err_same');
+    else if (!date.value || date.value < today) msg = t('err_date');
+    else if (date.value > date.max) msg = t('err_date_max');
     if (msg) {
       e.preventDefault();
       showAlert(err, msg);

@@ -62,7 +62,7 @@ router.delete('/', async (req, res) => {
 // ---------- Favorites ----------
 router.get('/favorites', async (req, res) => {
   const rows = await db.query(
-    `SELECT p.slug, p.name, p.name_en, p.region, p.prefecture, p.area, p.category, p.summary, p.image, p.solo_score
+    `SELECT p.slug, p.name, p.name_en, p.name_vi, p.region, p.prefecture, p.area, p.category, p.summary, p.summary_en, p.summary_vi, p.image, p.solo_score
        FROM favorites f JOIN places p ON p.id = f.place_id
       WHERE f.user_id = $1 ORDER BY f.created_at DESC`,
     [req.user.id]

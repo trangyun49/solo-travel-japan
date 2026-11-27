@@ -3,9 +3,12 @@ const crypto = require('crypto');
 const db = require('./db');
 const places = require('./data/places');
 const posts = require('./data/posts');
+const photos = require('./data/photos');
+const placesI18n = require('./data/places-i18n');
+const postsI18n = require('./data/posts-i18n');
 
 // Bump when seed content in src/data changes so deployed DBs get refreshed.
-const SEED_VERSION = '2026-11-28.2';
+const SEED_VERSION = '2026-11-28.3';
 
 const PK = db.isPg ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
 
@@ -80,6 +83,31 @@ CREATE INDEX IF NOT EXISTS idx_posts_created ON posts(created_at);
 CREATE INDEX IF NOT EXISTS idx_history_user ON search_history(user_id);
 `;
 
+// Columns added after the first release (ALTER is idempotent via try/catch on both engines).
+const MIGRATIONS = [
+  ['places', 'name_vi', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'summary_en', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'summary_vi', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'tips_en', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'tips_vi', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'credit', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'credit_url', "TEXT NOT NULL DEFAULT ''"],
+  ['posts', 'title_en', "TEXT NOT NULL DEFAULT ''"],
+  ['posts', 'title_vi', "TEXT NOT NULL DEFAULT ''"],
+  ['posts', 'excerpt_en', "TEXT NOT NULL DEFAULT ''"],
+  ['posts', 'excerpt_vi', "TEXT NOT NULL DEFAULT ''"],
+];
+
+async function migrate() {
+  for (const [table, col, type] of MIGRATIONS) {
+    try {
+      await db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${type}`);
+    } catch (err) {
+      if (!/duplicate column|already exists/i.test(err.message)) throw err;
+    }
+  }
+}
+
 async function getMeta(key) {
   const row = await db.one('SELECT value FROM app_meta WHERE key = $1', [key]);
   return row ? row.value : null;
@@ -93,32 +121,44 @@ async function setMeta(key, value) {
 
 async function seed() {
   for (const p of places) {
+    const photo = photos[p.slug] || {};
+    const tr = placesI18n[p.slug] || {};
+    const en = tr.en || [];
+    const vi = tr.vi || [];
     await db.query(
       `INSERT INTO places (slug, name, name_en, region, prefecture, area, category, months, solo_score, featured,
-                           summary, description, solo_tips, access, budget, tags, image, city)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+                           summary, description, solo_tips, access, budget, tags, image, city,
+                           name_vi, summary_en, summary_vi, tips_en, tips_vi, credit, credit_url)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
        ON CONFLICT (slug) DO UPDATE SET
          name=EXCLUDED.name, name_en=EXCLUDED.name_en, region=EXCLUDED.region, prefecture=EXCLUDED.prefecture,
          area=EXCLUDED.area, category=EXCLUDED.category, months=EXCLUDED.months, solo_score=EXCLUDED.solo_score,
          featured=EXCLUDED.featured, summary=EXCLUDED.summary, description=EXCLUDED.description,
          solo_tips=EXCLUDED.solo_tips, access=EXCLUDED.access, budget=EXCLUDED.budget, tags=EXCLUDED.tags,
-         image=EXCLUDED.image, city=EXCLUDED.city`,
+         image=EXCLUDED.image, city=EXCLUDED.city, name_vi=EXCLUDED.name_vi, summary_en=EXCLUDED.summary_en,
+         summary_vi=EXCLUDED.summary_vi, tips_en=EXCLUDED.tips_en, tips_vi=EXCLUDED.tips_vi, credit=EXCLUDED.credit,
+         credit_url=EXCLUDED.credit_url`,
       [
         p.slug, p.name, p.name_en || '', p.region, p.prefecture, p.area || '', p.category,
         ',' + p.months.join(',') + ',', p.solo_score || 3, p.featured ? 1 : 0,
         p.summary, p.description, p.solo_tips || '', p.access || '', p.budget || '',
-        (p.tags || []).join(','), p.image || '', p.city || '',
+        (p.tags || []).join(','), photo.image || p.image || '', p.city || '',
+        vi[0] || '', en[1] || '', vi[1] || '', en[2] || '', vi[2] || '', photo.credit || '', photo.creditUrl || '',
       ]
     );
   }
   for (const b of posts) {
+    const pt = postsI18n[b.slug] || {};
     await db.query(
-      `INSERT INTO posts (slug, author_id, title, category, region, season, cover, excerpt, body, created_at, updated_at)
-       VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8, $9, $9)
+      `INSERT INTO posts (slug, author_id, title, category, region, season, cover, excerpt, body, created_at, updated_at,
+                          title_en, title_vi, excerpt_en, excerpt_vi)
+       VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8, $9, $9, $10, $11, $12, $13)
        ON CONFLICT (slug) DO UPDATE SET title=EXCLUDED.title, category=EXCLUDED.category, region=EXCLUDED.region,
          season=EXCLUDED.season, cover=EXCLUDED.cover, excerpt=EXCLUDED.excerpt, body=EXCLUDED.body,
-         updated_at=EXCLUDED.updated_at`,
-      [b.slug, b.title, b.category, b.region || '', b.season || 'all', b.cover || '', b.excerpt, b.body, b.date]
+         updated_at=EXCLUDED.updated_at, title_en=EXCLUDED.title_en, title_vi=EXCLUDED.title_vi,
+         excerpt_en=EXCLUDED.excerpt_en, excerpt_vi=EXCLUDED.excerpt_vi`,
+      [b.slug, b.title, b.category, b.region || '', b.season || 'all', b.cover || '', b.excerpt, b.body, b.date,
+       (pt.en || [])[0] || '', (pt.vi || [])[0] || '', (pt.en || [])[1] || '', (pt.vi || [])[1] || '']
     );
   }
 }
@@ -128,6 +168,7 @@ let jwtSecret = null;
 
 async function init() {
   await db.exec(SCHEMA);
+  await migrate();
   if ((await getMeta('seed_version')) !== SEED_VERSION) {
     await seed();
     await setMeta('seed_version', SEED_VERSION);

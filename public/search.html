@@ -6,10 +6,11 @@
 <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@500;600;700;800;900&display=swap">
 <link rel="stylesheet" href="/css/app.css">
+<script src="/js/i18n.js" defer></script>
 <script src="/js/common.js" defer></script>
-<title>旅を検索｜ひとり旅ジャパン</title>
+<title data-i18n="t_search">旅を検索｜ひとり旅ジャパン</title>
 <meta name="description" content="日本国内の航空券・高速バス・鉄道を1名分の条件で検索・比較。">
 <script src="/js/search-form.js" defer></script>
 <script src="/js/search.js" defer></script>
@@ -19,28 +20,28 @@
 <main>
   <div class="page-head">
     <div class="wrap">
-      <h1>旅を検索</h1>
-      <p>航空券・高速バス・鉄道・ホテルを、大人1名の条件でまとめて比較できます。</p>
+      <h1 data-i18n="search_title">旅を検索</h1>
+      <p data-i18n="search_lead">航空券・高速バス・鉄道・ホテルを、大人1名の条件でまとめて比較できます。</p>
       <form class="search-card" id="trip-form" action="/search" method="get" data-spa="1" novalidate>
         <div class="search-grid">
           <div class="field">
-            <label for="from">出発地</label>
+            <label for="from" data-i18n="from">出発地</label>
             <select class="select" id="from" name="from" required></select>
           </div>
-          <button class="swap-btn" type="button" id="swap" data-icon="swap" aria-label="出発地と目的地を入れ替える"></button>
+          <button class="swap-btn" type="button" id="swap" data-icon="swap" aria-label="出発地と目的地を入れ替える" data-i18n-aria="swap"></button>
           <div class="field">
-            <label for="to">目的地</label>
+            <label for="to" data-i18n="to">目的地</label>
             <select class="select" id="to" name="to" required></select>
           </div>
           <div class="field date-field">
-            <label for="date">出発日</label>
+            <label for="date" data-i18n="date">出発日</label>
             <input class="input" type="date" id="date" name="date" required>
           </div>
           <div class="field pax-field">
-            <label>人数</label>
-            <div class="pax" data-icon="solo">大人1名</div>
+            <label data-i18n="pax">人数</label>
+            <div class="pax" data-icon="solo" data-i18n="pax_one">大人1名</div>
           </div>
-          <button class="btn btn-primary btn-lg" type="submit" data-icon="search">検索する</button>
+          <button class="btn btn-primary btn-lg" type="submit" data-icon="search" data-i18n="search_btn">検索する</button>
         </div>
         <p class="alert alert-error" id="trip-error" hidden></p>
       </form>
@@ -49,7 +50,7 @@
 
   <div class="wrap section">
     <div id="results" aria-live="polite">
-      <div class="empty"><b>出発地・目的地・出発日を選んで検索してください</b>検索結果はここに表示されます。</div>
+      <div class="empty"><b data-i18n="search_empty">出発地・目的地・出発日を選んで検索してください</b><span data-i18n="search_empty2">検索結果はここに表示されます。</span></div>
     </div>
   </div>
 </main>

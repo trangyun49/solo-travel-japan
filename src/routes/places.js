@@ -6,7 +6,7 @@ const { REGIONS, CATEGORIES, SEASONS } = require('../data/meta');
 
 const router = express.Router();
 
-const LIST_COLS = `id, slug, name, name_en, region, prefecture, area, category, months, solo_score, featured, summary, tags, image`;
+const LIST_COLS = `id, slug, name, name_en, name_vi, region, prefecture, area, category, months, solo_score, featured, summary, summary_en, summary_vi, tags, image`;
 
 function shape(p) {
   return {
@@ -55,7 +55,7 @@ router.get('/', async (req, res) => {
       params.push(`%${kw}%`);
       const i = params.length;
       where.push(
-        `(LOWER(name) LIKE $${i} OR LOWER(name_en) LIKE $${i} OR LOWER(prefecture) LIKE $${i} OR LOWER(area) LIKE $${i} OR LOWER(summary) LIKE $${i} OR LOWER(tags) LIKE $${i})`
+        `(LOWER(name) LIKE $${i} OR LOWER(name_en) LIKE $${i} OR LOWER(prefecture) LIKE $${i} OR LOWER(area) LIKE $${i} OR LOWER(name_vi) LIKE $${i} OR LOWER(summary) LIKE $${i} OR LOWER(summary_en) LIKE $${i} OR LOWER(summary_vi) LIKE $${i} OR LOWER(tags) LIKE $${i})`
       );
     }
   }

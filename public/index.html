@@ -6,10 +6,11 @@
 <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@500;600;700;800;900&display=swap">
 <link rel="stylesheet" href="/css/app.css">
+<script src="/js/i18n.js" defer></script>
 <script src="/js/common.js" defer></script>
-<title>ひとり旅ジャパン｜日本のひとり旅を検索・計画する</title>
+<title data-i18n="t_home">ひとり旅ジャパン｜日本のひとり旅を検索・計画する</title>
 <meta name="description" content="日本をひとりで旅する人のための旅行サイト。航空券・高速バス・鉄道の検索、季節ごとのおすすめスポット、グルメ、ひとり旅ブログ。">
 <script src="/js/search-form.js" defer></script>
 <script src="/js/home.js" defer></script>
@@ -20,32 +21,32 @@
   <section class="hero">
     <div class="hero-bg" aria-hidden="true"></div>
     <div class="wrap">
-      <h1>ひとりで行く日本を、もっと自由に。</h1>
-      <p class="hero-lead">出発地と目的地を選ぶだけで、航空券・高速バス・鉄道を1名分の条件でまとめて比較。季節に合ったスポットと、ひとりで入りやすいお店も見つかります。</p>
+      <h1 data-i18n="hero_title">ひとりで行く日本を、もっと自由に。</h1>
+      <p class="hero-lead" data-i18n="hero_lead">出発地と目的地を選ぶだけで、航空券・高速バス・鉄道を1名分の条件でまとめて比較。季節に合ったスポットと、ひとりで入りやすいお店も見つかります。</p>
 
       <form class="search-card" id="trip-form" action="/search" method="get" novalidate>
         <div class="search-tabs" aria-hidden="true">
-          <span data-icon="plane">航空券</span><span data-icon="bus">高速バス</span><span data-icon="train">新幹線・鉄道</span><span data-icon="hotel">ホテル</span>
+          <span data-icon="plane" data-i18n="tab_flight">航空券</span><span data-icon="bus" data-i18n="tab_bus">高速バス</span><span data-icon="train" data-i18n="tab_train">新幹線・鉄道</span><span data-icon="hotel" data-i18n="tab_hotel">ホテル</span>
         </div>
         <div class="search-grid">
           <div class="field">
-            <label for="from">出発地</label>
+            <label for="from" data-i18n="from">出発地</label>
             <select class="select" id="from" name="from" required></select>
           </div>
-          <button class="swap-btn" type="button" id="swap" data-icon="swap" aria-label="出発地と目的地を入れ替える"></button>
+          <button class="swap-btn" type="button" id="swap" data-icon="swap" aria-label="出発地と目的地を入れ替える" data-i18n-aria="swap"></button>
           <div class="field">
-            <label for="to">目的地</label>
+            <label for="to" data-i18n="to">目的地</label>
             <select class="select" id="to" name="to" required></select>
           </div>
           <div class="field date-field">
-            <label for="date">出発日</label>
+            <label for="date" data-i18n="date">出発日</label>
             <input class="input" type="date" id="date" name="date" required>
           </div>
           <div class="field pax-field">
-            <label>人数</label>
-            <div class="pax" data-icon="solo">大人1名</div>
+            <label data-i18n="pax">人数</label>
+            <div class="pax" data-icon="solo" data-i18n="pax_one">大人1名</div>
           </div>
-          <button class="btn btn-primary btn-lg" type="submit" data-icon="search">検索する</button>
+          <button class="btn btn-primary btn-lg" type="submit" data-icon="search" data-i18n="search_btn">検索する</button>
         </div>
         <p class="alert alert-error" id="trip-error" hidden></p>
       </form>
@@ -55,8 +56,8 @@
   <section class="season-band" aria-labelledby="season-title">
     <div class="wrap">
       <div class="band-head">
-        <h2 id="season-title">いつ行く？ 月ごとのおすすめ</h2>
-        <p id="season-caption">月を選ぶと、その時期に見頃・食べ頃のスポットに切り替わります。</p>
+        <h2 id="season-title" data-i18n="season_title">いつ行く？ 月ごとのおすすめ</h2>
+        <p id="season-caption" data-i18n="season_caption">月を選ぶと、その時期に見頃・食べ頃のスポットに切り替わります。</p>
       </div>
       <div class="months" id="months" role="group" aria-label="月を選択"></div>
     </div>
@@ -67,9 +68,9 @@
       <div class="section-head">
         <div>
           <h2 id="month-title">おすすめスポット</h2>
-          <p>ひとり旅のしやすさ（●の数）が高い順に表示しています。</p>
+          <p data-i18n="month_sub">ひとり旅のしやすさ（●の数）が高い順に表示しています。</p>
         </div>
-        <a class="btn btn-outline" id="month-more" href="/places">すべて見る</a>
+        <a class="btn btn-outline" id="month-more" href="/places" data-i18n="see_all">すべて見る</a>
       </div>
       <div class="grid" id="month-places" aria-live="polite"><div class="spinner" role="status" aria-label="読み込み中"></div></div>
     </div>
@@ -77,12 +78,12 @@
 
   <section class="section">
     <div class="wrap">
-      <div class="section-head"><div><h2>目的から探す</h2></div></div>
+      <div class="section-head"><div><h2 data-i18n="by_purpose">目的から探す</h2></div></div>
       <div class="cat-row">
-        <a class="cat-link" href="/places?featured=1"><span class="cat-glyph glyph-torii">推</span><span><b>おすすめ</b><span>編集部が選んだ定番と絶景</span></span></a>
-        <a class="cat-link" href="/places?category=gourmet"><span class="cat-glyph cat-gourmet">食</span><span><b>グルメ</b><span>カウンターで気楽にひとりご飯</span></span></a>
-        <a class="cat-link" href="/places?category=sightseeing"><span class="cat-glyph cat-sightseeing">観</span><span><b>観光スポット</b><span>寺社・絶景・街歩き</span></span></a>
-        <a class="cat-link" href="/places?solo=1"><span class="cat-glyph glyph-ink">独</span><span><b>ひとり旅</b><span>ひとりこそ楽しい場所だけ</span></span></a>
+        <a class="cat-link" href="/places?featured=1"><span class="cat-glyph glyph-torii">推</span><span><b data-i18n="nav_featured">おすすめ</b><span data-i18n="purpose_featured">編集部が選んだ定番と絶景</span></span></a>
+        <a class="cat-link" href="/places?category=gourmet"><span class="cat-glyph cat-gourmet">食</span><span><b data-i18n="cat_gourmet">グルメ</b><span data-i18n="purpose_gourmet">カウンターで気楽にひとりご飯</span></span></a>
+        <a class="cat-link" href="/places?category=sightseeing"><span class="cat-glyph cat-sightseeing">観</span><span><b data-i18n="cat_sightseeing">観光スポット</b><span data-i18n="purpose_sightseeing">寺社・絶景・街歩き</span></span></a>
+        <a class="cat-link" href="/places?solo=1"><span class="cat-glyph glyph-ink">独</span><span><b data-i18n="pcat_solo">ひとり旅</b><span data-i18n="purpose_solo">ひとりこそ楽しい場所だけ</span></span></a>
       </div>
     </div>
   </section>
@@ -91,10 +92,10 @@
     <div class="wrap">
       <div class="section-head">
         <div>
-          <h2>ブログ・旅のヒント</h2>
-          <p>計画のコツから、旅人の体験記まで。</p>
+          <h2 data-i18n="blog_title">ブログ・旅のヒント</h2>
+          <p data-i18n="blog_sub">計画のコツから、旅人の体験記まで。</p>
         </div>
-        <a class="btn btn-outline" href="/blog">記事をもっと読む</a>
+        <a class="btn btn-outline" href="/blog" data-i18n="read_more">記事をもっと読む</a>
       </div>
       <div class="post-grid" id="home-posts"><div class="spinner" role="status" aria-label="読み込み中"></div></div>
     </div>

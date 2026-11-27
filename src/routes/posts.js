@@ -9,7 +9,7 @@ const { REGIONS, SEASONS, POST_CATEGORIES, COVERS } = require('../data/meta');
 const router = express.Router();
 const now = () => new Date().toISOString();
 
-const LIST_SQL = `SELECT p.slug, p.title, p.category, p.region, p.season, p.cover, p.excerpt, p.created_at, p.updated_at,
+const LIST_SQL = `SELECT p.slug, p.title, p.title_en, p.title_vi, p.excerpt_en, p.excerpt_vi, p.category, p.region, p.season, p.cover, p.excerpt, p.created_at, p.updated_at,
                          p.author_id, COALESCE(u.display_name, '編集部') AS author_name
                     FROM posts p LEFT JOIN users u ON u.id = p.author_id`;
 
@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
     if (kw) {
       params.push(`%${kw}%`);
       const i = params.length;
-      where.push(`(LOWER(p.title) LIKE $${i} OR LOWER(p.excerpt) LIKE $${i} OR LOWER(p.body) LIKE $${i})`);
+      where.push(`(LOWER(p.title) LIKE $${i} OR LOWER(p.excerpt) LIKE $${i} OR LOWER(p.body) LIKE $${i} OR LOWER(p.title_en) LIKE $${i} OR LOWER(p.title_vi) LIKE $${i})`);
     }
   }
   const sqlWhere = where;

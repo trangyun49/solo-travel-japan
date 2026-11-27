@@ -37,22 +37,22 @@ function flightLinks(a, b, date) {
   const links = [
     {
       provider: 'Trip.com',
-      label: 'Trip.comで航空券を検索',
+      kind: 'flight_search', label: 'Trip.comで航空券を検索',
       url: `https://jp.trip.com/flights/showfarefirst?dcity=${a.tripCode}&acity=${b.tripCode}&ddate=${date}&triptype=ow&class=y&quantity=1&locale=ja-JP&curr=JPY`,
     },
     {
-      provider: 'Google フライト',
-      label: 'Googleフライトで比較',
+      provider: 'Google Flights',
+      kind: 'flight_compare', label: 'Googleフライトで比較',
       url: `https://www.google.com/travel/flights?q=${enc(`Flights from ${A} to ${B} on ${date} one way 1 adult`)}&hl=ja&curr=JPY`,
     },
     {
       provider: 'Skyscanner',
-      label: 'スカイスキャナーで比較',
+      kind: 'flight_compare', label: 'スカイスキャナーで比較',
       url: `https://www.skyscanner.jp/transport/flights/${A.toLowerCase()}/${B.toLowerCase()}/${y.slice(2)}${m}${d}/?adultsv2=1&cabinclass=economy&rtn=0`,
     },
     {
       provider: 'Traveloka',
-      label: 'Travelokaで検索',
+      kind: 'flight_search', label: 'Travelokaで検索',
       url: `https://www.traveloka.com/ja-jp/flight/fullsearch?ap=${A}.${B}&dt=${d}-${m}-${y}.NA&ps=1.0.0&sc=ECONOMY`,
     },
   ];
@@ -67,11 +67,11 @@ function busLinks(a, b, date) {
   return [
     {
       provider: 'バス比較なび',
-      label: '高速バス・夜行バスを比較',
+      kind: 'bus_compare', label: '高速バス・夜行バスを比較',
       url: `https://www.bushikaku.net/search/${a.bus}_${b.bus}/${ymd}/`,
     },
-    { provider: 'WILLER EXPRESS', label: 'WILLERの高速バスを予約', url: 'https://travel.willer.co.jp/' },
-    { provider: '高速バスネット', label: 'JRバス系の高速バスを予約', url: 'https://www.kousokubus.net/' },
+    { provider: 'WILLER EXPRESS', kind: 'bus_willer', label: 'WILLERの高速バスを予約', url: 'https://travel.willer.co.jp/' },
+    { provider: '高速バスネット', kind: 'bus_jr', label: 'JRバス系の高速バスを予約', url: 'https://www.kousokubus.net/' },
   ];
 }
 
@@ -80,23 +80,23 @@ function trainLinks(a, b, date) {
   const [y, m, d] = date.split('-');
   const links = [
     {
-      provider: 'Google マップ',
-      label: '乗換ルート・所要時間を確認',
+      provider: 'Google Maps',
+      kind: 'train_route', label: '乗換ルート・所要時間を確認',
       url: `https://www.google.com/maps/dir/?api=1&origin=${enc(a.station)}&destination=${enc(b.station)}&travelmode=transit`,
     },
     {
       provider: 'NAVITIME',
-      label: 'NAVITIMEで時刻表・運賃を検索',
+      kind: 'train_timetable', label: 'NAVITIMEで時刻表・運賃を検索',
       url: `https://www.navitime.co.jp/transfer/searchlist?orvStationName=${enc(a.station.replace(/駅$/, ''))}&dnvStationName=${enc(b.station.replace(/駅$/, ''))}&month=${y}/${m}&day=${d}&hour=8&minute=0&basis=1`,
     },
   ];
   const east = ['hokkaido', 'tohoku', 'kanto', 'chubu'];
   const west = ['kanto', 'chubu', 'kansai', 'chugoku', 'kyushu'];
   if (east.includes(a.region) && east.includes(b.region)) {
-    links.push({ provider: 'えきねっと', label: 'JR東日本の新幹線・特急を予約', url: 'https://www.eki-net.com/' });
+    links.push({ provider: 'えきねっと', kind: 'train_east', label: 'JR東日本の新幹線・特急を予約', url: 'https://www.eki-net.com/' });
   }
   if (west.includes(a.region) && west.includes(b.region)) {
-    links.push({ provider: 'スマートEX', label: '東海道・山陽・九州新幹線を予約', url: 'https://smart-ex.jp/' });
+    links.push({ provider: 'スマートEX', kind: 'train_west', label: '東海道・山陽・九州新幹線を予約', url: 'https://smart-ex.jp/' });
   }
   return links;
 }
@@ -107,12 +107,12 @@ function hotelLinks(b, date) {
   return [
     {
       provider: 'Agoda',
-      label: `${b.name}のホテル（${date}から1泊・大人1名）`,
+      kind: 'hotel_city', label: `${b.name}のホテル（${date}から1泊・大人1名）`,
       url: `https://www.agoda.com/ja-jp/city/${agodaSlug}-jp.html?checkIn=${date}&los=1&rooms=1&adults=1&children=0`,
     },
     {
       provider: 'Trip.com',
-      label: 'Trip.comでホテルを探す（目的地・日付は予約サイトで入力）',
+      kind: 'hotel_home', label: 'Trip.comでホテルを探す（目的地・日付は予約サイトで入力）',
       url: 'https://jp.trip.com/hotels/?locale=ja-JP&curr=JPY',
     },
   ];
@@ -123,23 +123,23 @@ function suggestions(a, b, km) {
   const s = [];
   const hasAir = a.airports.length && b.airports.length && a.airports.join() !== b.airports.join();
   if (a.island || b.island) {
-    s.push({ mode: 'flight', title: '飛行機がおすすめ', note: '離島・沖縄方面は飛行機が基本の移動手段です。' });
+    s.push({ key: 'flight_island', mode: 'flight', title: '飛行機がおすすめ', note: '離島・沖縄方面は飛行機が基本の移動手段です。' });
     return s;
   }
   const crossesStrait = crossesHokkaido(a, b);
   if (km < 120) {
-    s.push({ mode: 'train', title: '電車・在来線/特急', note: '近距離のため電車が便利です。' });
-    if (!crossesStrait) s.push({ mode: 'bus', title: '路線バス・高速バス', note: '乗換が少ない直行バスがある区間も。' });
+    s.push({ key: 'train_short', mode: 'train', title: '電車・在来線/特急', note: '近距離のため電車が便利です。' });
+    if (!crossesStrait) s.push({ key: 'bus_short', mode: 'bus', title: '路線バス・高速バス', note: '乗換が少ない直行バスがある区間も。' });
   } else if (km < 450 && !crossesStrait) {
-    s.push({ mode: 'train', title: '新幹線・特急', note: '中距離は鉄道が速くて確実。駅が市街地にあるのも利点です。' });
-    s.push({ mode: 'bus', title: '高速バス・夜行バス', note: '費用を抑えたいひとり旅に。女性専用席のある便も。' });
-    if (hasAir && km > 300) s.push({ mode: 'flight', title: '飛行機', note: 'LCCのセール時は鉄道より安いことも。' });
+    s.push({ key: 'train_mid', mode: 'train', title: '新幹線・特急', note: '中距離は鉄道が速くて確実。駅が市街地にあるのも利点です。' });
+    s.push({ key: 'bus_mid', mode: 'bus', title: '高速バス・夜行バス', note: '費用を抑えたいひとり旅に。女性専用席のある便も。' });
+    if (hasAir && km > 300) s.push({ key: 'flight_mid', mode: 'flight', title: '飛行機', note: 'LCCのセール時は鉄道より安いことも。' });
   } else {
-    if (hasAir) s.push({ mode: 'flight', title: '飛行機がおすすめ', note: '長距離は飛行機が最速。LCCも就航しています。' });
+    if (hasAir) s.push({ key: 'flight_long', mode: 'flight', title: '飛行機がおすすめ', note: '長距離は飛行機が最速。LCCも就航しています。' });
     if (!crossesStrait || ['hakodate', 'aomori'].includes(a.key) || ['hakodate', 'aomori'].includes(b.key)) {
-      s.push({ mode: 'train', title: '新幹線', note: '乗り換えを含めて時間はかかりますが、景色を楽しめます。' });
+      s.push({ key: 'train_long', mode: 'train', title: '新幹線', note: '乗り換えを含めて時間はかかりますが、景色を楽しめます。' });
     }
-    if (!crossesStrait) s.push({ mode: 'bus', title: '夜行バス', note: '宿泊費を節約できる長距離バス。座席タイプを要確認。' });
+    if (!crossesStrait) s.push({ key: 'bus_night', mode: 'bus', title: '夜行バス', note: '宿泊費を節約できる長距離バス。座席タイプを要確認。' });
   }
   return s;
 }

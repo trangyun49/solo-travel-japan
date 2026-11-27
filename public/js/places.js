@@ -1,11 +1,12 @@
 (function () {
   'use strict';
-  const { qs, qsa, api, params, placeCard, loadFavoriteSet, esc, CATEGORY, REGION, SEASON } = window.STJ;
+  const { qs, qsa, api, params, placeCard, loadFavoriteSet, esc, CATEGORY, REGION, SEASON, t, lang } = window.STJ;
+  const { monthName } = window.I18N;
   const form = qs('#filters');
   const list = qs('#list');
   const count = qs('#count');
   const monthSel = qs('#month');
-  for (let m = 1; m <= 12; m++) monthSel.insertAdjacentHTML('beforeend', `<option value="${m}">${m}月</option>`);
+  for (let m = 1; m <= 12; m++) monthSel.insertAdjacentHTML('beforeend', `<option value="${m}">${monthName(m)}</option>`);
 
   const state = { q: '', category: '', region: '', season: '', month: '', solo: '', featured: '' };
   const p = params();
@@ -23,13 +24,18 @@
     qs('#solo').checked = state.solo === '1';
     qs('#featured').checked = state.featured === '1';
     const parts = [];
-    if (state.featured === '1') parts.push('おすすめ');
+    if (state.featured === '1') parts.push(t('nav_featured'));
     if (state.region) parts.push(REGION[state.region]);
-    if (state.month) parts.push(`${state.month}月`);
+    if (state.month) parts.push(monthName(Number(state.month)));
     else if (state.season) parts.push(SEASON[state.season]);
-    if (state.solo === '1') parts.push('ひとり旅');
-    parts.push(state.category ? CATEGORY[state.category] : 'スポット');
-    qs('#page-title').textContent = parts.length > 1 ? parts.join('の') : 'スポットを探す';
+    if (state.solo === '1') parts.push(t('pcat_solo'));
+    if (lang === 'ja') {
+      parts.push(state.category ? CATEGORY[state.category] : t('title_spots'));
+      qs('#page-title').textContent = parts.length > 1 ? parts.join('の') : t('places_title');
+    } else {
+      if (state.category) parts.push(CATEGORY[state.category]);
+      qs('#page-title').textContent = parts.length ? `${t('places_title')}: ${parts.join(' · ')}` : t('places_title');
+    }
   }
 
   let seq = 0;
@@ -39,17 +45,17 @@
     Object.entries(state).forEach(([k, v]) => v && q.set(k, v));
     if (push) history.replaceState(null, '', '/places' + (q.toString() ? '?' + q : ''));
     const my = ++seq;
-    list.innerHTML = '<div class="spinner" role="status" aria-label="読み込み中"></div>';
+    list.innerHTML = `<div class="spinner" role="status" aria-label="${t('loading')}"></div>`;
     try {
       const { places } = await api('/places?' + q);
       if (my !== seq) return;
-      count.textContent = `${places.length}件のスポット`;
+      count.textContent = t('count_places', { n: places.length });
       list.innerHTML = places.length
         ? places.map((x) => placeCard(x, { favorites: favs })).join('')
-        : '<div class="empty"><b>条件に合うスポットが見つかりません</b>条件を減らすか、別の季節・エリアを選んでください。</div>';
+        : `<div class="empty"><b>${t('places_empty')}</b>${t('places_empty2')}</div>`;
     } catch (err) {
       count.textContent = '';
-      list.innerHTML = `<div class="empty"><b>読み込めませんでした</b>${esc(err.message)}</div>`;
+      list.innerHTML = `<div class="empty"><b>${t('load_failed')}</b>${esc(err.message)}</div>`;
     }
   }
 
@@ -74,10 +80,10 @@
     state.featured = e.target.checked ? '1' : '';
     load();
   });
-  let t;
+  let timer;
   qs('#q').addEventListener('input', (e) => {
-    clearTimeout(t);
-    t = setTimeout(() => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
       state.q = e.target.value.trim();
       load();
     }, 300);

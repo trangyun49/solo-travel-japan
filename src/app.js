@@ -7,6 +7,7 @@ const { ready } = require('./init');
 const { attachUser } = require('./auth');
 const { HttpError } = require('./validate');
 const meta = require('./data/meta');
+const { langOf, translate } = require('./i18n');
 
 const app = express();
 app.disable('x-powered-by');
@@ -93,7 +94,8 @@ app.use((err, req, res, _next) => {
   if (err.type === 'entity.parse.failed') err = new HttpError(400, 'JSONの形式が正しくありません。');
   const status = err.status && err.status < 600 ? err.status : 500;
   if (status >= 500) console.error(err);
-  res.status(status).json({ error: status >= 500 ? 'サーバーエラーが発生しました。時間をおいて再度お試しください。' : err.message });
+  const msg = status >= 500 ? 'サーバーエラーが発生しました。時間をおいて再度お試しください。' : err.message;
+  res.status(status).json({ error: translate(msg, langOf(req)) });
 });
 
 module.exports = app;
