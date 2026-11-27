@@ -138,7 +138,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .month:hover { background: #edf1f7; }
 .month[aria-pressed='true'] { background: var(--ink); color: #fff; }
 .month[aria-pressed='true'] small { color: rgba(255, 255, 255, 0.75); }
-.month.is-now::after { content: '今'; position: absolute; top: -10px; right: 4px; font-size: 10px; background: var(--torii); color: #fff; border-radius: 4px; padding: 0 4px; line-height: 16px; }
+.month.is-now::after { content: attr(data-now); position: absolute; top: -10px; right: 4px; font-size: 10px; background: var(--torii); color: #fff; border-radius: 4px; padding: 0 4px; line-height: 16px; }
 .month[data-season='spring'] { --c: var(--spring); }
 .month[data-season='summer'] { --c: var(--summer); }
 .month[data-season='autumn'] { --c: var(--autumn); }
@@ -512,3 +512,11 @@ h1, h2, h3, h4, .brand, .btn, .card-title { font-weight: 800; }
   .nav.open .nav-auth { display: block; }
   .brand { font-size: 15px; }
 }
+
+/* destination guide on trip results */
+.dest-guide { margin-top: 36px; padding: 28px; background: #fff; border: 2px dashed var(--card-pink); border-radius: var(--radius-lg); }
+.dest-guide .section-head h2 { font-size: 24px; }
+.chip[disabled] { opacity: 0.45; cursor: not-allowed; }
+@media (max-width: 600px) { .dest-guide { padding: 18px 14px; } }
+
+.cat-glyph .svg { width: 26px; height: 26px; }

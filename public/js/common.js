@@ -45,6 +45,8 @@
     map: '<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/>',
     globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>',
     check: '<path d="M5 12l5 5 9-10"/>',
+    star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+    food: '<path d="M4 11h16a8 8 0 0 1-16 0zM8 3v4M12 3v4M16 3v4"/>',
   };
   function icon(name, cls = 'svg') {
     return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
@@ -256,7 +258,6 @@
     <div class="card-body">
       <div class="card-meta"><span>${icon('pin')} ${esc(REGION[p.region] || '')}${lang === 'ja' ? '・' + esc(p.area || p.prefecture) : ''}</span>${soloMeter(p.solo_score)}</div>
       <h3 class="card-title">${esc(placeName(p))}</h3>
-      ${lang !== 'ja' ? `<p class="card-sub">${esc(p.name)}</p>` : ''}
       <p class="card-text">${esc(placeSummary(p))}</p>
     </div>
   </a>

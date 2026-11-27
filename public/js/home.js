@@ -13,7 +13,7 @@
   let html = '';
   for (let m = 1; m <= 12; m++) {
     const s = seasonOf(m);
-    html += `<button type="button" class="month${m === nowMonth ? ' is-now' : ''}" data-month="${m}" data-season="${s}" aria-pressed="false">${monthShort(m)}<small>${SEASON[s]}</small></button>`;
+    html += `<button type="button" class="month${m === nowMonth ? ' is-now' : ''}" data-now="${t('now_badge')}" data-month="${m}" data-season="${s}" aria-pressed="false">${monthShort(m)}<small>${SEASON[s]}</small></button>`;
   }
   monthsEl.innerHTML = html;
 

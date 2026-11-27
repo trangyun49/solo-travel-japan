@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="/css/app.css">
 <script src="/js/i18n.js" defer></script>
 <script src="/js/common.js" defer></script>
-<title data-i18n="t_write">体験記を書く｜ひとり旅ジャパン</title>
+<title data-i18n="t_write">体験記を書く｜Solo Travel Japan</title>
 <script src="/js/write.js" defer></script>
 </head>
 <body>
@@ -60,12 +60,12 @@
       <div class="field">
         <div class="result-bar">
           <label for="body" data-i18n="f_body">本文（30〜8,000文字）</label>
-          <div class="chips" role="group" aria-label="表示切替">
+          <div class="chips" role="group" aria-label="表示切替" data-i18n-aria="view_toggle">
             <button type="button" class="chip" id="mode-edit" aria-pressed="true" data-i18n="mode_edit">編集</button>
             <button type="button" class="chip" id="mode-preview" aria-pressed="false" data-i18n="mode_preview">プレビュー</button>
           </div>
         </div>
-        <textarea class="textarea" id="body" name="body" maxlength="8000" required placeholder="## 見出し&#10;段落は空行で区切ります。&#10;- 箇条書きは「- 」で始めます&#10;**太字** も使えます"></textarea>
+        <textarea class="textarea" id="body" name="body" maxlength="8000" required data-i18n-ph="body_ph" placeholder="## 見出し&#10;段落は空行で区切ります。&#10;- 箇条書きは「- 」で始めます&#10;**太字** も使えます"></textarea>
         <div class="editor-preview prose" id="preview" hidden></div>
         <p class="hint"><span id="char-count">0</span> / 8,000 ・ <span data-i18n="body_hint">「## 」で見出し、「- 」で箇条書き、「**文字**」で太字になります。</span></p>
       </div>

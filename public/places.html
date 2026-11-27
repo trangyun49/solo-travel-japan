@@ -10,8 +10,8 @@
 <link rel="stylesheet" href="/css/app.css">
 <script src="/js/i18n.js" defer></script>
 <script src="/js/common.js" defer></script>
-<title data-i18n="t_places">スポットを探す｜ひとり旅ジャパン</title>
-<meta name="description" content="季節・月・エリア・カテゴリから、ひとり旅におすすめの観光スポット、グルメ、カフェ、温泉を探せます。">
+<title data-i18n="t_places">スポットを探す｜Solo Travel Japan</title>
+<meta name="description" data-i18n-content="meta_places" content="季節・月・エリア・カテゴリから、ひとり旅におすすめの観光スポット、グルメ、カフェ、温泉を探せます。">
 <script src="/js/places.js" defer></script>
 </head>
 <body>
@@ -25,7 +25,7 @@
   </div>
   <div class="wrap section">
     <div class="layout-side">
-      <form class="filters collapsed" id="filters" role="search" aria-label="スポットの絞り込み">
+      <form class="filters collapsed" id="filters" role="search" aria-label="スポットの絞り込み" data-i18n-aria="filter_places">
         <div class="field">
           <label for="q" data-i18n="keyword">キーワード</label>
           <input class="input" type="search" id="q" name="q" placeholder="例：京都、ラーメン、夜景" data-i18n-ph="keyword_ph" maxlength="50">
@@ -81,7 +81,7 @@
           <p id="count" aria-live="polite"></p>
           <button type="button" class="btn btn-outline btn-sm filter-toggle" id="filter-toggle" aria-controls="filters" aria-expanded="false" data-icon="filter" data-i18n="filters">絞り込み</button>
         </div>
-        <div class="grid" id="list"><div class="spinner" role="status" aria-label="読み込み中"></div></div>
+        <div class="grid" id="list"><div class="spinner" role="status" aria-label="読み込み中" data-i18n-aria="loading"></div></div>
       </div>
     </div>
   </div>

@@ -6,7 +6,7 @@ const { REGIONS, CATEGORIES, SEASONS } = require('../data/meta');
 
 const router = express.Router();
 
-const LIST_COLS = `id, slug, name, name_en, name_vi, region, prefecture, area, category, months, solo_score, featured, summary, summary_en, summary_vi, tags, image`;
+const LIST_COLS = `id, slug, name, name_en, name_vi, region, prefecture, area, category, months, solo_score, featured, summary, summary_en, summary_vi, tags, image, city`;
 
 function shape(p) {
   return {

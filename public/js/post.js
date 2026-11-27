@@ -24,7 +24,6 @@
       <article class="article">
         <nav class="crumbs" aria-label="breadcrumb"><a href="/">${t('home')}</a> ／ <a href="/blog">${t('nav_blog')}</a> ／ <a href="/blog?category=${p.category}">${esc(POST_CAT[p.category])}</a></nav>
         <h1 class="page-title-lg">${esc(title)}</h1>
-        ${lang !== 'ja' && title !== p.title ? `<p class="card-sub" lang="ja">${esc(p.title)}</p>` : ''}
         <div class="byline">
           <span class="avatar">${esc(authorName(p).slice(0, 1))}</span>
           <span>${esc(authorName(p))}</span>
@@ -36,8 +35,7 @@
           </span>
         </div>
         ${p.cover ? `<div class="article-cover"><img src="/img/${esc(p.cover)}" alt=""></div>` : '<div class="mt"></div>'}
-        ${lang !== 'ja' && !p.author_id ? `<p class="alert alert-info">${t('ja_only')}</p>` : ''}
-        <div class="prose">${renderMarkdown(p.body)}</div>
+        <div class="prose">${renderMarkdown(window.I18N.pick(p, 'body', 'body_en', 'body_vi'))}</div>
         ${
           d.canEdit
             ? `<div class="post-actions"><a class="btn btn-outline" href="/write?slug=${encodeURIComponent(p.slug)}">${icon('pen')} ${t('edit')}</a><button class="btn btn-danger" type="button" id="delete-post">${t('del')}</button></div>`

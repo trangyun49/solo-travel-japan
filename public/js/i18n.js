@@ -19,8 +19,8 @@
   // key: [ja, vi, en]
   const D = {
     // brand / nav
-    brand: ['ひとり旅ジャパン', 'Solo Travel Japan', 'Solo Travel Japan'],
-    brand_sub: ['Solo Travel Japan', 'Du lịch Nhật một mình', 'Travel Japan your way'],
+    brand: ['Solo Travel Japan', 'Solo Travel Japan', 'Solo Travel Japan'],
+    brand_sub: ['ひとり旅ガイド', 'Du lịch Nhật một mình', 'Travel Japan your way'],
     nav_search: ['旅を検索', 'Tìm chuyến đi', 'Search trips'],
     nav_places: ['スポット', 'Địa điểm', 'Places'],
     nav_featured: ['おすすめ', 'Nổi bật', 'Featured'],
@@ -111,7 +111,7 @@
     // place detail
     home: ['ホーム', 'Trang chủ', 'Home'],
     solo_points: ['ひとり旅のポイント', 'Mẹo khi đi một mình', 'Solo tips'],
-    best_season: ['ベストシーズン', 'Thời điểm đẹp nhất', 'Best season'],
+    best_season: ['1年のベストシーズン', 'Thời điểm đẹp nhất trong năm', 'Best time of the year'],
     access: ['アクセス', 'Cách đi', 'Getting there'], budget: ['予算の目安', 'Chi phí tham khảo', 'Budget guide'],
     map_btn: ['Googleマップで見る', 'Xem trên Google Maps', 'View on Google Maps'],
     route_btn: ['{c}への行き方を検索', 'Tìm đường đến {c}', 'Search trips to {c}'],
@@ -260,16 +260,33 @@
     nf_text: ['お探しのページは見つかりませんでした。URLが変わったか、削除された可能性があります。', 'Không tìm thấy trang. Có thể đường dẫn đã thay đổi hoặc bị xóa.', 'We couldn’t find that page. It may have moved or been deleted.'],
     nf_home: ['ホームへ戻る', 'Về trang chủ', 'Go home'],
     // page titles
-    t_home: ['ひとり旅ジャパン｜日本のひとり旅を検索・計画する', 'Solo Travel Japan | Lên kế hoạch du lịch Nhật một mình', 'Solo Travel Japan | Plan your solo trip in Japan'],
-    t_search: ['旅を検索｜ひとり旅ジャパン', 'Tìm chuyến đi | Solo Travel Japan', 'Search trips | Solo Travel Japan'],
-    t_places: ['スポットを探す｜ひとり旅ジャパン', 'Địa điểm | Solo Travel Japan', 'Places | Solo Travel Japan'],
-    t_blog: ['ブログ・旅のヒント｜ひとり旅ジャパン', 'Blog | Solo Travel Japan', 'Blog | Solo Travel Japan'],
-    t_login: ['ログイン｜ひとり旅ジャパン', 'Đăng nhập | Solo Travel Japan', 'Log in | Solo Travel Japan'],
-    t_register: ['新規登録｜ひとり旅ジャパン', 'Đăng ký | Solo Travel Japan', 'Sign up | Solo Travel Japan'],
-    t_account: ['マイページ｜ひとり旅ジャパン', 'Trang cá nhân | Solo Travel Japan', 'My page | Solo Travel Japan'],
-    t_write: ['体験記を書く｜ひとり旅ジャパン', 'Viết bài | Solo Travel Japan', 'Write | Solo Travel Japan'],
-    t_404: ['ページが見つかりません｜ひとり旅ジャパン', 'Không tìm thấy trang | Solo Travel Japan', 'Page not found | Solo Travel Japan'],
-    suffix: ['｜ひとり旅ジャパン', ' | Solo Travel Japan', ' | Solo Travel Japan'],
+    t_home: ['Solo Travel Japan｜日本のひとり旅を検索・計画する', 'Solo Travel Japan | Lên kế hoạch du lịch Nhật một mình', 'Solo Travel Japan | Plan your solo trip in Japan'],
+    t_search: ['旅を検索｜Solo Travel Japan', 'Tìm chuyến đi | Solo Travel Japan', 'Search trips | Solo Travel Japan'],
+    t_places: ['スポットを探す｜Solo Travel Japan', 'Địa điểm | Solo Travel Japan', 'Places | Solo Travel Japan'],
+    t_blog: ['ブログ・旅のヒント｜Solo Travel Japan', 'Blog | Solo Travel Japan', 'Blog | Solo Travel Japan'],
+    t_login: ['ログイン｜Solo Travel Japan', 'Đăng nhập | Solo Travel Japan', 'Log in | Solo Travel Japan'],
+    t_register: ['新規登録｜Solo Travel Japan', 'Đăng ký | Solo Travel Japan', 'Sign up | Solo Travel Japan'],
+    t_account: ['マイページ｜Solo Travel Japan', 'Trang cá nhân | Solo Travel Japan', 'My page | Solo Travel Japan'],
+    t_write: ['体験記を書く｜Solo Travel Japan', 'Viết bài | Solo Travel Japan', 'Write | Solo Travel Japan'],
+    t_404: ['ページが見つかりません｜Solo Travel Japan', 'Không tìm thấy trang | Solo Travel Japan', 'Page not found | Solo Travel Japan'],
+    suffix: ['｜Solo Travel Japan', ' | Solo Travel Japan', ' | Solo Travel Japan'],
+    choose_month: ['月を選択', 'Chọn tháng', 'Choose a month'],
+    filter_places: ['スポットの絞り込み', 'Lọc địa điểm', 'Filter places'],
+    filter_posts: ['記事の絞り込み', 'Lọc bài viết', 'Filter posts'],
+    account_menu: ['マイページメニュー', 'Menu trang cá nhân', 'My page menu'],
+    view_toggle: ['表示切替', 'Chuyển chế độ xem', 'Switch view'],
+    body_ph: ['## 見出し\n段落は空行で区切ります。\n- 箇条書きは「- 」で始めます\n**太字** も使えます', '## Tiêu đề\nCác đoạn cách nhau bằng một dòng trống.\n- Gạch đầu dòng bắt đầu bằng “- ”\n**Chữ đậm** cũng dùng được', '## Heading\nSeparate paragraphs with a blank line.\n- Start list items with “- ”\n**Bold** works too'],
+    meta_home: ['日本をひとりで旅する人のための旅行サイト。航空券・高速バス・鉄道の検索、季節ごとのおすすめスポット、グルメ、ひとり旅ブログ。', 'Trang du lịch cho người đi Nhật Bản một mình: tìm vé máy bay, xe bus, tàu; địa điểm theo mùa, ẩm thực và blog.', 'A travel site for solo travellers in Japan: search flights, buses and trains, seasonal places, food and stories.'],
+    meta_places: ['季節・月・エリア・カテゴリから、ひとり旅におすすめの観光スポット、グルメ、カフェ、温泉を探せます。', 'Tìm điểm tham quan, ẩm thực, cà phê, onsen hợp đi một mình theo mùa, tháng, khu vực.', 'Find solo-friendly sights, food, cafés and hot springs by season, month and area.'],
+    meta_blog: ['日本のひとり旅に役立つコツ、グルメ、季節の観光情報、旅人の体験記。', 'Mẹo, ẩm thực, thông tin theo mùa và chia sẻ cho chuyến đi Nhật một mình.', 'Tips, food, seasonal guides and stories for solo travel in Japan.'],
+    meta_search: ['日本国内の航空券・高速バス・鉄道を1名分の条件で検索・比較。', 'Tìm và so sánh vé máy bay, xe bus, tàu nội địa Nhật cho 1 người.', 'Search and compare domestic flights, buses and trains in Japan for one adult.'],
+    now_badge: ['今', 'Nay', 'Now'],
+    ja_name: ['', 'Tên tiếng Nhật', 'Japanese name'],
+    dest_title: ['{c}で何する？ {m}のおすすめ', 'Ở {c} có gì? Gợi ý cho {m}', 'What to do in {c} in {m}'],
+    dest_sub: ['出発日の月に合わせて、目的地周辺のグルメ・カフェ・観光スポット・温泉を表示しています。', 'Gợi ý ẩm thực, cà phê, điểm tham quan và onsen quanh điểm đến, theo đúng tháng bạn đi.', 'Food, cafés, sights and hot springs around your destination for the month you travel.'],
+    dest_nearby: ['{r}エリアのスポットも含みます', 'Bao gồm cả địa điểm trong vùng {r}', 'Includes places elsewhere in {r}'],
+    dest_empty: ['この時期・エリアに該当するスポットはまだありません。', 'Chưa có địa điểm phù hợp với tháng và khu vực này.', 'No places for this month and area yet.'],
+    dest_all_places: ['{r}のスポットをすべて見る', 'Xem tất cả địa điểm ở {r}', 'See all places in {r}'],
   };
   const IDX = { ja: 0, vi: 1, en: 2 };
   const EN_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -306,6 +323,7 @@
     root.querySelectorAll('[data-i18n]').forEach((el) => (el.textContent = t(el.dataset.i18n)));
     root.querySelectorAll('[data-i18n-ph]').forEach((el) => el.setAttribute('placeholder', t(el.dataset.i18nPh)));
     root.querySelectorAll('[data-i18n-aria]').forEach((el) => el.setAttribute('aria-label', t(el.dataset.i18nAria)));
+    root.querySelectorAll('[data-i18n-content]').forEach((el) => el.setAttribute('content', t(el.dataset.i18nContent)));
   }
 
   function setLang(l) {

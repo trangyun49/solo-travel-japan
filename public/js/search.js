@@ -1,6 +1,7 @@
 (function () {
   'use strict';
-  const { qs, api, params, icon, esc, placeCard, getMe, REGION, t, lang } = window.STJ;
+  const { qs, api, params, icon, esc, placeCard, getMe, REGION, CATEGORY, t, lang, loadFavoriteSet } = window.STJ;
+  const { monthName } = window.I18N;
   const out = qs('#results');
   const MODE_ICON = { flight: 'plane', bus: 'bus', train: 'train' };
   const yen = (n) => '¥' + Number(n).toLocaleString('ja-JP');
@@ -8,6 +9,9 @@
   const timeOf = (s) => (s ? String(s).slice(11, 16) : '');
   const cn = (c) => (lang === 'ja' ? c.name : c.en || c.name);
   const locale = lang === 'ja' ? 'ja-JP' : lang === 'vi' ? 'vi-VN' : 'en-GB';
+
+  const PROVIDER_LATIN = { 'バス比較なび': 'Bushikaku (バス比較なび)', '高速バスネット': 'Kousokubus.net', 'えきねっと': 'Eki-net (えきねっと)', 'スマートEX': 'SmartEX' };
+  const providerName = (p) => (lang === 'ja' ? p : PROVIDER_LATIN[p] || p);
 
   function linkLabel(l, ctx) {
     if (lang === 'ja') return l.label;
@@ -18,7 +22,7 @@
     return `<div class="link-list">${links
       .map(
         (l) => `<a class="link-item" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">
-          <span><b>${esc(l.provider)}</b><span>${esc(linkLabel(l, ctx))}</span></span>${icon('ext')}</a>`
+          <span><b>${esc(providerName(l.provider))}</b><span>${esc(linkLabel(l, ctx))}</span></span>${icon('ext')}</a>`
       )
       .join('')}</div>`;
   }
@@ -120,16 +124,13 @@
             <div class="panel-head"><h2>${icon('hotel')} ${t('hotels_in', { c: esc(cn(d.to)) })}</h2></div>
             <div class="panel-body"><p class="note mb">${t('hotel_note', { d: esc(d.date) })}</p>${linkList(d.links.hotel, d)}</div>
           </section>
-          <section class="panel">
-            <div class="panel-head"><h2>${t('spots_in', { r: esc(REGION[d.to.region]) })}</h2></div>
-            <div class="panel-body" id="dest-places"><div class="spinner"></div></div>
-          </section>
           <section class="panel" id="history-panel" hidden>
             <div class="panel-head"><h2>${t('recent_searches')}</h2></div>
             <div class="panel-body" id="history-list"></div>
           </section>
         </aside>
-      </div>`;
+      </div>
+      <section class="dest-guide" id="dest-guide" aria-live="polite"><div class="spinner"></div></section>`;
 
     out.querySelector('.mode-tabs').addEventListener('click', (e) => {
       const b = e.target.closest('[data-show]');
@@ -141,11 +142,7 @@
       });
     });
 
-    api(`/places?region=${d.to.region}&sort=solo&limit=3`).then(({ places }) => {
-      qs('#dest-places').innerHTML = places.length
-        ? `<div class="grid">${places.map((x) => placeCard(x)).join('')}</div>`
-        : `<p class="note">${t('no_spots_area')}</p>`;
-    });
+    destinationGuide(d);
 
     const me = await getMe();
     if (me) {
@@ -163,6 +160,54 @@
           .join('');
       }
     }
+  }
+
+  /** "What to do at the destination": places near the destination city, in the travel month, by category. */
+  async function destinationGuide(d) {
+    const box = qs('#dest-guide');
+    const month = Number(d.date.slice(5, 7));
+    const city = cn(d.to);
+    const region = REGION[d.to.region];
+    let places = [];
+    let favs = new Set();
+    try {
+      [{ places }, favs] = await Promise.all([api(`/places?region=${d.to.region}&month=${month}&limit=100`), loadFavoriteSet()]);
+    } catch (err) {
+      box.innerHTML = `<div class="empty"><b>${t('load_failed')}</b>${esc(err.message)}</div>`;
+      return;
+    }
+    // Places whose hub city is the destination first, then the rest of the region.
+    places.sort((a, b) => (b.city === d.to.key) - (a.city === d.to.key) || b.solo_score - a.solo_score);
+    const nearby = places.some((x) => x.city !== d.to.key);
+    const cats = ['gourmet', 'cafe', 'sightseeing', 'onsen'];
+    const count = (c) => places.filter((x) => x.category === c).length;
+    const tabs = [`<button type="button" class="chip" data-cat="" aria-pressed="true">${t('all')} (${places.length})</button>`]
+      .concat(cats.map((c) => `<button type="button" class="chip" data-cat="${c}" aria-pressed="false"${count(c) ? '' : ' disabled'}>${CATEGORY[c]} (${count(c)})</button>`))
+      .join('');
+    box.innerHTML = `
+      <div class="section-head">
+        <div>
+          <h2>${t('dest_title', { c: esc(city), m: esc(lang === 'vi' ? monthName(month).toLowerCase() : monthName(month)) })}</h2>
+          <p>${t('dest_sub')}${nearby ? ' ' + t('dest_nearby', { r: esc(region) }) : ''}</p>
+        </div>
+        <a class="btn btn-outline" href="/places?region=${d.to.region}&month=${month}">${t('dest_all_places', { r: esc(region) })}</a>
+      </div>
+      <div class="chips mb" role="group" aria-label="${t('category')}">${tabs}</div>
+      <div class="grid" id="dest-grid"></div>`;
+    const grid = qs('#dest-grid');
+    const show = (cat) => {
+      const list = places.filter((x) => !cat || x.category === cat).slice(0, 8);
+      grid.innerHTML = list.length
+        ? list.map((x) => placeCard(x, { favorites: favs })).join('')
+        : `<div class="empty">${t('dest_empty')}</div>`;
+    };
+    box.querySelector('.chips').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-cat]');
+      if (!b || b.disabled) return;
+      box.querySelectorAll('[data-cat]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      show(b.dataset.cat);
+    });
+    show('');
   }
 
   document.addEventListener('tripsearch', run);

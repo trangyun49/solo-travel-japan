@@ -6,9 +6,11 @@ const posts = require('./data/posts');
 const photos = require('./data/photos');
 const placesI18n = require('./data/places-i18n');
 const postsI18n = require('./data/posts-i18n');
+const placesDetail = require('./data/places-detail-i18n');
+const postsBody = require('./data/posts-body-i18n');
 
 // Bump when seed content in src/data changes so deployed DBs get refreshed.
-const SEED_VERSION = '2026-11-28.3';
+const SEED_VERSION = '2026-11-28.4';
 
 const PK = db.isPg ? 'SERIAL PRIMARY KEY' : 'INTEGER PRIMARY KEY AUTOINCREMENT';
 
@@ -92,6 +94,14 @@ const MIGRATIONS = [
   ['places', 'tips_vi', "TEXT NOT NULL DEFAULT ''"],
   ['places', 'credit', "TEXT NOT NULL DEFAULT ''"],
   ['places', 'credit_url', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'desc_en', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'desc_vi', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'access_en', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'access_vi', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'budget_en', "TEXT NOT NULL DEFAULT ''"],
+  ['places', 'budget_vi', "TEXT NOT NULL DEFAULT ''"],
+  ['posts', 'body_en', "TEXT NOT NULL DEFAULT ''"],
+  ['posts', 'body_vi', "TEXT NOT NULL DEFAULT ''"],
   ['posts', 'title_en', "TEXT NOT NULL DEFAULT ''"],
   ['posts', 'title_vi', "TEXT NOT NULL DEFAULT ''"],
   ['posts', 'excerpt_en', "TEXT NOT NULL DEFAULT ''"],
@@ -125,11 +135,15 @@ async function seed() {
     const tr = placesI18n[p.slug] || {};
     const en = tr.en || [];
     const vi = tr.vi || [];
+    const dt = placesDetail[p.slug] || {};
+    const de = dt.en || [];
+    const dv = dt.vi || [];
     await db.query(
       `INSERT INTO places (slug, name, name_en, region, prefecture, area, category, months, solo_score, featured,
                            summary, description, solo_tips, access, budget, tags, image, city,
-                           name_vi, summary_en, summary_vi, tips_en, tips_vi, credit, credit_url)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
+                           name_vi, summary_en, summary_vi, tips_en, tips_vi, credit, credit_url,
+                           desc_en, desc_vi, access_en, access_vi, budget_en, budget_vi)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31)
        ON CONFLICT (slug) DO UPDATE SET
          name=EXCLUDED.name, name_en=EXCLUDED.name_en, region=EXCLUDED.region, prefecture=EXCLUDED.prefecture,
          area=EXCLUDED.area, category=EXCLUDED.category, months=EXCLUDED.months, solo_score=EXCLUDED.solo_score,
@@ -137,13 +151,16 @@ async function seed() {
          solo_tips=EXCLUDED.solo_tips, access=EXCLUDED.access, budget=EXCLUDED.budget, tags=EXCLUDED.tags,
          image=EXCLUDED.image, city=EXCLUDED.city, name_vi=EXCLUDED.name_vi, summary_en=EXCLUDED.summary_en,
          summary_vi=EXCLUDED.summary_vi, tips_en=EXCLUDED.tips_en, tips_vi=EXCLUDED.tips_vi, credit=EXCLUDED.credit,
-         credit_url=EXCLUDED.credit_url`,
+         credit_url=EXCLUDED.credit_url, desc_en=EXCLUDED.desc_en, desc_vi=EXCLUDED.desc_vi,
+         access_en=EXCLUDED.access_en, access_vi=EXCLUDED.access_vi, budget_en=EXCLUDED.budget_en,
+         budget_vi=EXCLUDED.budget_vi`,
       [
         p.slug, p.name, p.name_en || '', p.region, p.prefecture, p.area || '', p.category,
         ',' + p.months.join(',') + ',', p.solo_score || 3, p.featured ? 1 : 0,
         p.summary, p.description, p.solo_tips || '', p.access || '', p.budget || '',
         (p.tags || []).join(','), photo.image || p.image || '', p.city || '',
         vi[0] || '', en[1] || '', vi[1] || '', en[2] || '', vi[2] || '', photo.credit || '', photo.creditUrl || '',
+        de[0] || '', dv[0] || '', de[1] || '', dv[1] || '', de[2] || '', dv[2] || '',
       ]
     );
   }
@@ -151,14 +168,15 @@ async function seed() {
     const pt = postsI18n[b.slug] || {};
     await db.query(
       `INSERT INTO posts (slug, author_id, title, category, region, season, cover, excerpt, body, created_at, updated_at,
-                          title_en, title_vi, excerpt_en, excerpt_vi)
-       VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8, $9, $9, $10, $11, $12, $13)
+                          title_en, title_vi, excerpt_en, excerpt_vi, body_en, body_vi)
+       VALUES ($1, NULL, $2, $3, $4, $5, $6, $7, $8, $9, $9, $10, $11, $12, $13, $14, $15)
        ON CONFLICT (slug) DO UPDATE SET title=EXCLUDED.title, category=EXCLUDED.category, region=EXCLUDED.region,
          season=EXCLUDED.season, cover=EXCLUDED.cover, excerpt=EXCLUDED.excerpt, body=EXCLUDED.body,
          updated_at=EXCLUDED.updated_at, title_en=EXCLUDED.title_en, title_vi=EXCLUDED.title_vi,
-         excerpt_en=EXCLUDED.excerpt_en, excerpt_vi=EXCLUDED.excerpt_vi`,
+         excerpt_en=EXCLUDED.excerpt_en, excerpt_vi=EXCLUDED.excerpt_vi, body_en=EXCLUDED.body_en, body_vi=EXCLUDED.body_vi`,
       [b.slug, b.title, b.category, b.region || '', b.season || 'all', b.cover || '', b.excerpt, b.body, b.date,
-       (pt.en || [])[0] || '', (pt.vi || [])[0] || '', (pt.en || [])[1] || '', (pt.vi || [])[1] || '']
+       (pt.en || [])[0] || '', (pt.vi || [])[0] || '', (pt.en || [])[1] || '', (pt.vi || [])[1] || '',
+       (postsBody[b.slug] || {}).en || '', (postsBody[b.slug] || {}).vi || '']
     );
   }
 }
