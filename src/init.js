@@ -102,6 +102,7 @@ const MIGRATIONS = [
   ['places', 'budget_vi', "TEXT NOT NULL DEFAULT ''"],
   ['posts', 'body_en', "TEXT NOT NULL DEFAULT ''"],
   ['posts', 'body_vi', "TEXT NOT NULL DEFAULT ''"],
+  ['posts', 'lang', "TEXT NOT NULL DEFAULT 'ja'"],
   ['posts', 'title_en', "TEXT NOT NULL DEFAULT ''"],
   ['posts', 'title_vi', "TEXT NOT NULL DEFAULT ''"],
   ['posts', 'excerpt_en', "TEXT NOT NULL DEFAULT ''"],

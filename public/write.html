@@ -43,15 +43,21 @@
       </div>
       <div class="form-row">
         <div class="field">
+          <label for="lang" data-i18n="post_lang">記事の言語</label>
+          <select class="select" id="lang" name="lang">
+            <option value="ja">日本語</option><option value="vi">Tiếng Việt</option><option value="en">English</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="season" data-i18n="season">季節</label>
           <select class="select" id="season" name="season">
             <option value="all" data-i18n="season_all">通年</option><option value="spring" data-i18n="season_spring">春</option><option value="summer" data-i18n="season_summer">夏</option><option value="autumn" data-i18n="season_autumn">秋</option><option value="winter" data-i18n="season_winter">冬</option>
           </select>
         </div>
-        <div class="field">
-          <label for="excerpt" data-i18n="f_excerpt">概要（任意・140文字まで）</label>
-          <input class="input" id="excerpt" name="excerpt" maxlength="140" placeholder="空欄なら本文の冒頭を使います" data-i18n-ph="f_excerpt_ph">
-        </div>
+      </div>
+      <div class="field">
+        <label for="excerpt" data-i18n="f_excerpt">概要（任意・140文字まで）</label>
+        <input class="input" id="excerpt" name="excerpt" maxlength="140" placeholder="空欄なら本文の冒頭を使います" data-i18n-ph="f_excerpt_ph">
       </div>
       <fieldset class="field">
         <legend class="hint" data-i18n="f_cover">カバー画像</legend>

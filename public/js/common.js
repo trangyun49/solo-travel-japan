@@ -270,7 +270,7 @@
       : `<div class="thumb-fallback cat-sightseeing" aria-hidden="true"><span class="kanji">記</span><span class="en">${esc(POST_CAT[p.category] || '')}</span></div>`;
     return `
 <a class="card post-card" href="/post?slug=${encodeURIComponent(p.slug)}">
-  <div class="thumb">${cover}<div class="badges"><span class="badge${p.category === 'solo' ? ' badge-solo' : ''}">${esc(POST_CAT[p.category] || '')}</span>${p.season && p.season !== 'all' ? `<span class="badge">${SEASON[p.season]}</span>` : ''}</div></div>
+  <div class="thumb">${cover}<div class="badges"><span class="badge${p.category === 'solo' ? ' badge-solo' : ''}">${esc(POST_CAT[p.category] || '')}</span>${p.author_id && p.lang && p.lang !== lang ? `<span class="badge">${esc(t('lname_' + p.lang))}</span>` : ''}${p.season && p.season !== 'all' ? `<span class="badge">${SEASON[p.season]}</span>` : ''}</div></div>
   <div class="card-body">
     <div class="card-meta"><span>${esc(authorName(p))}</span><span>${fmtDate(p.created_at)}</span>${p.region ? `<span>${esc(REGION[p.region])}</span>` : ''}</div>
     <h3 class="card-title">${esc(postTitle(p))}</h3>

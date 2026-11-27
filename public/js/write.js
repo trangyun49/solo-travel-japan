@@ -12,6 +12,7 @@
     `<label><input type="radio" name="cover" value=""><span class="none">${t('no_image')}</span></label>` +
     COVERS.map((c, i) => `<label><input type="radio" name="cover" value="${c}"${i === 0 ? ' checked' : ''}><img src="/img/${c}" alt="${esc(c.replace('.jpg', ''))}"></label>`).join('');
 
+  qs('#lang').value = window.STJ.lang;
   const counter = () => (qs('#char-count').textContent = body.value.length.toLocaleString());
   body.addEventListener('input', counter);
 
@@ -42,6 +43,7 @@
         qs('#category').value = p.category;
         qs('#region').value = p.region || '';
         qs('#season').value = p.season || 'all';
+        qs('#lang').value = p.lang || 'ja';
         qs('#excerpt').value = p.excerpt || '';
         body.value = p.body;
         const radio = form.querySelector(`input[name="cover"][value="${CSS.escape(p.cover || '')}"]`);
@@ -64,6 +66,7 @@
       category: qs('#category').value,
       region: qs('#region').value,
       season: qs('#season').value,
+      lang: qs('#lang').value,
       excerpt: qs('#excerpt').value,
       cover: (form.querySelector('input[name="cover"]:checked') || {}).value || '',
       body: body.value,

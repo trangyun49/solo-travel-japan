@@ -9,7 +9,7 @@ const { REGIONS, SEASONS, POST_CATEGORIES, COVERS } = require('../data/meta');
 const router = express.Router();
 const now = () => new Date().toISOString();
 
-const LIST_SQL = `SELECT p.slug, p.title, p.title_en, p.title_vi, p.excerpt_en, p.excerpt_vi, p.category, p.region, p.season, p.cover, p.excerpt, p.created_at, p.updated_at,
+const LIST_SQL = `SELECT p.slug, p.lang, p.title, p.title_en, p.title_vi, p.excerpt_en, p.excerpt_vi, p.category, p.region, p.season, p.cover, p.excerpt, p.created_at, p.updated_at,
                          p.author_id, COALESCE(u.display_name, '編集部') AS author_name
                     FROM posts p LEFT JOIN users u ON u.id = p.author_id`;
 
@@ -68,8 +68,9 @@ function readPostBody(body) {
   const season = v.oneOf(body.season, ['all', ...SEASONS.map((s) => s.key)], '季節', 'all');
   const cover = body.cover ? v.oneOf(body.cover, COVERS, 'カバー画像') : '';
   const text = v.str(body.body, { field: '本文', min: 30, max: 8000, required: true });
+  const lang = v.oneOf(body.lang, ['ja', 'vi', 'en'], '言語', 'ja');
   const excerpt = v.str(body.excerpt, { field: '概要', max: 140 }) || text.replace(/^#+\s*/gm, '').replace(/\s+/g, ' ').slice(0, 110);
-  return { title, category, region, season, cover, body: text, excerpt };
+  return { title, category, region, season, cover, body: text, excerpt, lang };
 }
 
 router.post('/', requireAuth, async (req, res) => {
@@ -77,9 +78,9 @@ router.post('/', requireAuth, async (req, res) => {
   const slug = 'u-' + Date.now().toString(36) + '-' + crypto.randomBytes(3).toString('hex');
   const t = now();
   await db.query(
-    `INSERT INTO posts (slug, author_id, title, category, region, season, cover, excerpt, body, created_at, updated_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$10)`,
-    [slug, req.user.id, p.title, p.category, p.region, p.season, p.cover, p.excerpt, p.body, t]
+    `INSERT INTO posts (slug, author_id, title, category, region, season, cover, excerpt, body, created_at, updated_at, lang)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$10,$11)`,
+    [slug, req.user.id, p.title, p.category, p.region, p.season, p.cover, p.excerpt, p.body, t, p.lang]
   );
   res.status(201).json({ slug });
 });
@@ -95,8 +96,8 @@ router.put('/:slug', requireAuth, async (req, res) => {
   const post = await ownPost(req);
   const p = readPostBody(req.body);
   await db.query(
-    `UPDATE posts SET title=$1, category=$2, region=$3, season=$4, cover=$5, excerpt=$6, body=$7, updated_at=$8 WHERE id=$9`,
-    [p.title, p.category, p.region, p.season, p.cover, p.excerpt, p.body, now(), post.id]
+    `UPDATE posts SET title=$1, category=$2, region=$3, season=$4, cover=$5, excerpt=$6, body=$7, updated_at=$8, lang=$9 WHERE id=$10`,
+    [p.title, p.category, p.region, p.season, p.cover, p.excerpt, p.body, now(), p.lang, post.id]
   );
   res.json({ slug: req.params.slug });
 });

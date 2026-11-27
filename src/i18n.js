@@ -31,6 +31,7 @@ const FIELDS = {
   日付: ['ngày', 'Date'],
   出発日: ['ngày khởi hành', 'Departure date'],
   月: ['tháng', 'Month'],
+  言語: ['ngôn ngữ', 'Language'],
 };
 const f = (name, lang) => (FIELDS[name] ? FIELDS[name][lang === 'vi' ? 0 : 1] : name);
 

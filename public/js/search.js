@@ -36,7 +36,10 @@
         <div class="panel-body"><p class="note">${reason}</p></div></section>`;
     }
     let body = '';
-    const notes = lang === 'ja' ? [d.from.airportNote, d.to.airportNote].filter(Boolean).map((n) => `<p class="note">${esc(n)}</p>`).join('') : '';
+    const notes = [d.from, d.to]
+      .filter((c) => c.airportNote)
+      .map((c) => `<p class="note">${esc(t('airport_note', { c: cn(c) }))}</p>`)
+      .join('');
     if (f.available) {
       const rows = f.results.length
         ? f.results

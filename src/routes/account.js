@@ -104,7 +104,7 @@ router.delete('/history', async (req, res) => {
 // ---------- My posts ----------
 router.get('/posts', async (req, res) => {
   const rows = await db.query(
-    `SELECT slug, title, category, region, season, cover, excerpt, created_at, updated_at
+    `SELECT slug, lang, title, category, region, season, cover, excerpt, created_at, updated_at
        FROM posts WHERE author_id = $1 ORDER BY created_at DESC`,
     [req.user.id]
   );

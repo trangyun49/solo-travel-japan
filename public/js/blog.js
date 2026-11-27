@@ -22,7 +22,7 @@
     return `<a class="post-feature" href="/post?slug=${encodeURIComponent(x.slug)}">
       <div class="thumb">${cover}</div>
       <div class="card-body">
-        <div class="card-meta"><span class="badge${x.category === 'solo' ? ' badge-solo' : ''}">${esc(POST_CAT[x.category])}</span><span>${esc(authorName(x))}</span><span>${fmtDate(x.created_at)}</span></div>
+        <div class="card-meta"><span class="badge${x.category === 'solo' ? ' badge-solo' : ''}">${esc(POST_CAT[x.category])}</span>${x.author_id && x.lang && x.lang !== window.STJ.lang ? `<span class="badge badge-lang">${esc(t('lname_' + x.lang))}</span>` : ''}<span>${esc(authorName(x))}</span><span>${fmtDate(x.created_at)}</span></div>
         <h2 class="card-title">${esc(postTitle(x))}</h2>
         <p class="card-text">${esc(postExcerpt(x))}</p>
       </div></a>`;
