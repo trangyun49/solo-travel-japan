@@ -3,6 +3,7 @@ const express = require('express');
 const db = require('../db');
 const v = require('../validate');
 const { REGIONS, CATEGORIES, SEASONS } = require('../data/meta');
+const { CITIES } = require('../data/cities');
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.get('/', async (req, res) => {
   const q = req.query;
 
   if (q.region) add('region = ?', v.oneOf(q.region, REGIONS.map((r) => r.key), '地域'));
+  if (q.city) add('city = ?', v.oneOf(q.city, CITIES.map((c) => c.key), '目的地'));
   if (q.category) add('category = ?', v.oneOf(q.category, CATEGORIES.map((c) => c.key), 'カテゴリ'));
 
   let months = null;

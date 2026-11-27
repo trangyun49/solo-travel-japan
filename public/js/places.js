@@ -8,7 +8,8 @@
   const monthSel = qs('#month');
   for (let m = 1; m <= 12; m++) monthSel.insertAdjacentHTML('beforeend', `<option value="${m}">${monthName(m)}</option>`);
 
-  const state = { q: '', category: '', region: '', season: '', month: '', solo: '', featured: '' };
+  const state = { q: '', city: '', category: '', region: '', season: '', month: '', solo: '', featured: '' };
+  let cityName = '';
   const p = params();
   Object.keys(state).forEach((k) => (state[k] = p.get(k) || ''));
   if (state.month) state.season = '';
@@ -23,6 +24,10 @@
     monthSel.value = state.month;
     qs('#solo').checked = state.solo === '1';
     qs('#featured').checked = state.featured === '1';
+    if (state.city) {
+      qs('#page-title').textContent = t('city_places', { c: cityName || state.city });
+      return;
+    }
     const parts = [];
     if (state.featured === '1') parts.push(t('nav_featured'));
     if (state.region) parts.push(REGION[state.region]);
@@ -98,8 +103,12 @@
     e.currentTarget.setAttribute('aria-expanded', String(!collapsed));
   });
 
-  loadFavoriteSet().then((f) => {
+  Promise.all([loadFavoriteSet(), state.city ? api('/trips/cities') : null]).then(([f, c]) => {
     favs = f;
+    if (c) {
+      const hit = c.cities.find((x) => x.key === state.city);
+      if (hit) cityName = lang === 'ja' ? hit.name : hit.en;
+    }
     load(false);
   });
 })();

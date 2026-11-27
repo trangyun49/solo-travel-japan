@@ -165,51 +165,64 @@
     }
   }
 
-  /** "What to do at the destination": places near the destination city, in the travel month, by category. */
+  /** "What to do at the destination": places in the destination city only, for the travel month, by category. */
   async function destinationGuide(d) {
     const box = qs('#dest-guide');
     const month = Number(d.date.slice(5, 7));
     const city = cn(d.to);
-    const region = REGION[d.to.region];
     let places = [];
+    let anyMonth = 0;
     let favs = new Set();
     try {
-      [{ places }, favs] = await Promise.all([api(`/places?region=${d.to.region}&month=${month}&limit=100`), loadFavoriteSet()]);
+      const [inMonth, all, f] = await Promise.all([
+        api(`/places?city=${d.to.key}&month=${month}&sort=solo&limit=100`),
+        api(`/places?city=${d.to.key}&limit=100`),
+        loadFavoriteSet(),
+      ]);
+      places = inMonth.places;
+      anyMonth = all.places.length;
+      favs = f;
     } catch (err) {
       box.innerHTML = `<div class="empty"><b>${t('load_failed')}</b>${esc(err.message)}</div>`;
       return;
     }
-    // Places whose hub city is the destination first, then the rest of the region.
-    places.sort((a, b) => (b.city === d.to.key) - (a.city === d.to.key) || b.solo_score - a.solo_score);
-    const nearby = places.some((x) => x.city !== d.to.key);
+    const monthLabel = lang === 'vi' ? monthName(month).toLowerCase() : monthName(month);
     const cats = ['gourmet', 'cafe', 'sightseeing', 'onsen'];
     const count = (c) => places.filter((x) => x.category === c).length;
-    const tabs = [`<button type="button" class="chip" data-cat="" aria-pressed="true">${t('all')} (${places.length})</button>`]
-      .concat(cats.map((c) => `<button type="button" class="chip" data-cat="${c}" aria-pressed="false"${count(c) ? '' : ' disabled'}>${CATEGORY[c]} (${count(c)})</button>`))
-      .join('');
+    const tabs = places.length
+      ? `<div class="chips mb" role="group" aria-label="${t('category')}">` +
+        [`<button type="button" class="chip" data-cat="" aria-pressed="true">${t('all')} (${places.length})</button>`]
+          .concat(cats.map((c) => `<button type="button" class="chip" data-cat="${c}" aria-pressed="false"${count(c) ? '' : ' disabled'}>${CATEGORY[c]} (${count(c)})</button>`))
+          .join('') +
+        '</div>'
+      : '';
+    const allLink = anyMonth ? `<a class="btn btn-outline" href="/places?city=${d.to.key}">${t('dest_all_city', { c: esc(city), n: anyMonth })}</a>` : '';
     box.innerHTML = `
       <div class="section-head">
         <div>
-          <h2>${t('dest_title', { c: esc(city), m: esc(lang === 'vi' ? monthName(month).toLowerCase() : monthName(month)) })}</h2>
-          <p>${t('dest_sub')}${nearby ? ' ' + t('dest_nearby', { r: esc(region) }) : ''}</p>
+          <h2>${t('dest_title', { c: esc(city), m: esc(monthLabel) })}</h2>
+          <p>${t('dest_sub')}</p>
         </div>
-        <a class="btn btn-outline" href="/places?region=${d.to.region}&month=${month}">${t('dest_all_places', { r: esc(region) })}</a>
+        ${allLink}
       </div>
-      <div class="chips mb" role="group" aria-label="${t('category')}">${tabs}</div>
+      ${tabs}
       <div class="grid" id="dest-grid"></div>`;
     const grid = qs('#dest-grid');
     const show = (cat) => {
-      const list = places.filter((x) => !cat || x.category === cat).slice(0, 8);
+      const list = places.filter((x) => !cat || x.category === cat);
       grid.innerHTML = list.length
         ? list.map((x) => placeCard(x, { favorites: favs })).join('')
-        : `<div class="empty">${t('dest_empty')}</div>`;
+        : `<div class="empty">${anyMonth ? t('dest_empty_month', { c: esc(city), m: esc(monthLabel) }) : t('dest_empty_city', { c: esc(city) })}</div>`;
     };
-    box.querySelector('.chips').addEventListener('click', (e) => {
-      const b = e.target.closest('[data-cat]');
-      if (!b || b.disabled) return;
-      box.querySelectorAll('[data-cat]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      show(b.dataset.cat);
-    });
+    const chips = box.querySelector('.chips');
+    if (chips) {
+      chips.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-cat]');
+        if (!b || b.disabled) return;
+        chips.querySelectorAll('[data-cat]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+        show(b.dataset.cat);
+      });
+    }
     show('');
   }
 
