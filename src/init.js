@@ -93,6 +93,7 @@ CREATE INDEX IF NOT EXISTS idx_history_user ON search_history(user_id);
 
 // Columns added after the first release (ALTER is idempotent via try/catch on both engines).
 const MIGRATIONS = [
+  ['users', 'role', "TEXT NOT NULL DEFAULT 'user'"],
   ['places', 'name_vi', "TEXT NOT NULL DEFAULT ''"],
   ['places', 'summary_en', "TEXT NOT NULL DEFAULT ''"],
   ['places', 'summary_vi', "TEXT NOT NULL DEFAULT ''"],

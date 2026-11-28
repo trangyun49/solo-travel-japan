@@ -189,7 +189,12 @@
     getMe().then((user) => {
       const box = qs('#header-actions');
       if (user) {
-        box.innerHTML = `<a class="user-chip" href="/account" title="${t('mypage')}"><span class="avatar">${esc(user.displayName.slice(0, 1))}</span><span class="name">${esc(user.displayName)}</span></a>`;
+        const admin = user.role === 'admin';
+        box.innerHTML = `${admin ? `<a class="btn btn-admin btn-sm" href="/admin">${icon('lock')} <span>${t('admin_title')}</span></a>` : ''}<a class="user-chip${admin ? ' is-admin' : ''}" href="/account" title="${t('mypage')}"><span class="avatar">${esc(user.displayName.slice(0, 1))}</span><span class="name">${esc(user.displayName)}</span>${admin ? `<span class="badge badge-admin">${t('admin_badge')}</span>` : ''}</a>`;
+        if (admin) {
+          document.body.classList.add('is-admin');
+          qs('.site-header').insertAdjacentHTML('afterbegin', `<div class="admin-bar"><div class="wrap"><span>${icon('lock')} ${t('admin_mode')}</span><a href="/admin">${t('admin_open')}</a></div></div>`);
+        }
       } else {
         box.innerHTML = `<a class="btn btn-ghost btn-sm" href="/login">${t('login')}</a><a class="btn btn-primary btn-sm" href="/register">${t('register')}</a>`;
         qs('#main-nav').insertAdjacentHTML('beforeend', `<a class="nav-auth" href="/login">${t('login')}</a><a class="nav-auth" href="/register">${t('register')}</a>`);

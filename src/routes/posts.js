@@ -3,7 +3,7 @@ const express = require('express');
 const crypto = require('crypto');
 const db = require('../db');
 const v = require('../validate');
-const { requireAuth } = require('../auth');
+const { requireAuth, isAdmin } = require('../auth');
 const { REGIONS, SEASONS, POST_CATEGORIES, COVERS } = require('../data/meta');
 
 const router = express.Router();
@@ -54,11 +54,12 @@ router.get('/:slug', async (req, res) => {
   );
   if (!post) throw new v.HttpError(404, '記事が見つかりません。');
   const canEdit = Boolean(req.user && post.author_id && Number(post.author_id) === Number(req.user.id));
+  const canDelete = canEdit || isAdmin(req.user);
   const related = await db.query(
     `${LIST_SQL} WHERE p.slug <> $1 AND (p.category = $2 OR p.region = $3) ORDER BY p.created_at DESC LIMIT 3`,
     [post.slug, post.category, post.region || '__none__']
   );
-  res.json({ post, canEdit, related });
+  res.json({ post, canEdit, canDelete, related });
 });
 
 function readPostBody(body) {
@@ -103,7 +104,13 @@ router.put('/:slug', requireAuth, async (req, res) => {
 });
 
 router.delete('/:slug', requireAuth, async (req, res) => {
-  const post = await ownPost(req);
+  let post;
+  if (isAdmin(req.user)) {
+    post = await db.one('SELECT id FROM posts WHERE slug = $1', [req.params.slug]);
+    if (!post) throw new v.HttpError(404, '記事が見つかりません。');
+  } else {
+    post = await ownPost(req);
+  }
   await db.query('DELETE FROM posts WHERE id = $1', [post.id]);
   res.json({ ok: true });
 });

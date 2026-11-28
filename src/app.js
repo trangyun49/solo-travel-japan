@@ -68,6 +68,7 @@ api.use('/account', require('./routes/account'));
 api.use('/places', require('./routes/places'));
 api.use('/posts', require('./routes/posts'));
 api.use('/trips', require('./routes/trips'));
+api.use('/admin', require('./routes/admin'));
 api.use((_req, _res) => {
   throw new HttpError(404, 'Not found');
 });

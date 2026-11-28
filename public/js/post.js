@@ -49,8 +49,8 @@
         ${p.author_id && p.lang && p.lang !== lang ? translateBox(p) : ''}
         <div class="prose" lang="${esc(p.author_id ? p.lang || 'ja' : lang)}">${renderMarkdown(window.I18N.pick(p, 'body', 'body_en', 'body_vi'))}</div>
         ${
-          d.canEdit
-            ? `<div class="post-actions"><a class="btn btn-outline" href="/write?slug=${encodeURIComponent(p.slug)}">${icon('pen')} ${t('edit')}</a><button class="btn btn-danger" type="button" id="delete-post">${t('del')}</button></div>`
+          d.canEdit || d.canDelete
+            ? `<div class="post-actions">${d.canEdit ? `<a class="btn btn-outline" href="/write?slug=${encodeURIComponent(p.slug)}">${icon('pen')} ${t('edit')}</a>` : `<span class="badge badge-admin">${t('admin_badge')}</span>`}<button class="btn btn-danger" type="button" id="delete-post">${t('del')}</button></div>`
             : ''
         }
       </article>
@@ -64,7 +64,7 @@
         try {
           await api('/posts/' + encodeURIComponent(p.slug), { method: 'DELETE', body: {} });
           toast(t('post_deleted'));
-          setTimeout(() => (location.href = '/account?tab=posts'), 700);
+          setTimeout(() => (location.href = d.canEdit ? '/account?tab=posts' : '/admin'), 700);
         } catch (err) {
           toast(err.message);
           del.disabled = false;

@@ -81,3 +81,12 @@ scripts/smoke-test.js
 | GET | `/api/places/:slug` | Chi tiết địa điểm |
 | GET/POST/PUT/DELETE | `/api/posts[/:slug]` | Blog (lọc theo category/season/region/source/q; người dùng viết/sửa/xoá bài của mình) |
 | GET | `/api/trips/cities` · `/api/trips/search?from=&to=&date=` | Tìm hành trình (luôn 1 người lớn) |
+
+## Tài khoản quản trị (admin)
+
+Tài khoản có `role = 'admin'` trong bảng `users` sẽ thấy thanh xanh "管理者としてログイン中", nút **管理画面** và trang `/admin` (thống kê, danh sách người dùng, cấp/bỏ quyền, xoá bài của người dùng). Không thể tự đăng ký thành admin từ giao diện.
+
+Cấp quyền cho một tài khoản đã đăng ký:
+
+- Trên Neon (SQL Editor): `UPDATE users SET role = 'admin' WHERE email = 'ban@example.com';`
+- Hoặc bằng lệnh (dùng `DATABASE_URL` trong `.env` nếu có, không thì SQLite local): `npm run make-admin -- ban@example.com` (thêm `--remove` để bỏ quyền).

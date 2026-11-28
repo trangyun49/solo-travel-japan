@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Nunito:wght@500;600;700;800;900&display=swap">
+<link rel="stylesheet" href="/css/app.css">
+<script src="/js/i18n.js" defer></script>
+<script src="/js/common.js" defer></script>
+<title data-i18n="t_admin">管理画面｜Solo Travel Japan</title>
+<meta name="robots" content="noindex">
+<script src="/js/admin.js" defer></script>
+</head>
+<body>
+<div id="site-header"></div>
+<main>
+  <div class="page-head admin-head">
+    <div class="wrap">
+      <h1 data-i18n="admin_title">管理画面</h1>
+      <p data-i18n="admin_lead">ユーザー・投稿・利用状況を確認できます。</p>
+    </div>
+  </div>
+  <div class="wrap section">
+    <div id="admin-denied" class="empty" hidden><b data-i18n="admin_only">このページは管理者のみ表示できます。</b></div>
+    <div id="admin" hidden>
+      <div class="stat-grid" id="stats"></div>
+      <section class="panel">
+        <div class="panel-head"><h2 data-i18n="top_routes">よく検索される区間</h2></div>
+        <div class="panel-body" id="routes"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2 data-i18n="users_h">ユーザー一覧</h2><span class="note" id="users-count"></span></div>
+        <div class="panel-body table-wrap" id="users"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2 data-i18n="posts_h">ユーザー投稿の管理</h2><span class="note" id="posts-count"></span></div>
+        <div class="panel-body table-wrap" id="posts"></div>
+      </section>
+    </div>
+  </div>
+</main>
+<div id="site-footer"></div>
+</body>
+</html>

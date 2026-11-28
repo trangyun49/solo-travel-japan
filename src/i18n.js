@@ -13,6 +13,7 @@ function langOf(req) {
 }
 
 const FIELDS = {
+  権限: ['quyền', 'Role'],
   メールアドレス: ['email', 'Email'],
   パスワード: ['mật khẩu', 'Password'],
   新しいパスワード: ['mật khẩu mới', 'New password'],
@@ -51,6 +52,9 @@ function cap(s) {
 }
 
 const EXACT = {
+  '管理者のみ利用できます。': ['Chỉ quản trị viên mới dùng được.', 'Administrators only.'],
+  '自分の権限は変更できません。': ['Bạn không thể đổi quyền của chính mình.', 'You cannot change your own role.'],
+  'ユーザーが見つかりません。': ['Không tìm thấy người dùng.', 'User not found.'],
   'ログインが必要です。': ['Bạn cần đăng nhập.', 'Please log in.'],
   'このメールアドレスは既に登録されています。': ['Email này đã được đăng ký.', 'This email is already registered.'],
   'メールアドレスとパスワードを入力してください。': ['Vui lòng nhập email và mật khẩu.', 'Please enter your email and password.'],

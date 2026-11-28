@@ -32,7 +32,7 @@ async function attachUser(req, _res, next) {
   try {
     const payload = jwt.verify(token, getJwtSecret(), { algorithms: ['HS256'] });
     const user = await db.one(
-      'SELECT id, email, display_name, home_city, bio, token_version, created_at FROM users WHERE id = $1',
+      'SELECT id, email, display_name, home_city, bio, token_version, created_at, role FROM users WHERE id = $1',
       [Number(payload.sub)]
     );
     if (user && Number(user.token_version) === Number(payload.v)) req.user = user;
@@ -50,6 +50,16 @@ function requireAuth(req, res, next) {
   next();
 }
 
+const isAdmin = (u) => Boolean(u && u.role === 'admin');
+
+/** Admin-only routes. The role is read from the database on every request, so a change takes effect immediately. */
+function requireAdmin(req, res, next) {
+  const { HttpError } = require('./validate');
+  if (!req.user) throw new HttpError(401, 'ログインが必要です。');
+  if (!isAdmin(req.user)) throw new HttpError(403, '管理者のみ利用できます。');
+  next();
+}
+
 function publicUser(u) {
   return {
     id: u.id,
@@ -58,7 +68,8 @@ function publicUser(u) {
     homeCity: u.home_city,
     bio: u.bio,
     createdAt: u.created_at,
+    role: u.role === 'admin' ? 'admin' : 'user',
   };
 }
 
-module.exports = { issueSession, clearSession, attachUser, requireAuth, publicUser };
+module.exports = { issueSession, clearSession, attachUser, requireAuth, requireAdmin, isAdmin, publicUser };
